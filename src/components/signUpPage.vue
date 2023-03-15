@@ -15,13 +15,12 @@
         absolute
       "
     >
-      <a
-        href="#"
-        class="flex items-center mb-6 text-2xl font-semibold text-gray-900"
-      >
-        <img class="w-8 h-8 mr-2" src="../assets/image.png" alt="logo" />
-        FixMyCity
-      </a>
+      <router-link to="/"
+          class="flex items-center mb-6 text-2xl font-semibold text-gray-900"
+        >
+          <img class="w-8 h-8 mr-2" src="../assets/image.png" alt="logo" />
+          FixMyCity
+      </router-link>
       <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
           <h1
@@ -51,6 +50,7 @@
                 id="firstName"
                 v-model="form.firstName"
                 ref="firstName"
+                @blur="validateFirstName"
                 class="
                   bg-gray-50
                   border border-gray-300
@@ -66,6 +66,7 @@
                 required=""
               />
             </div>
+            <div v-if="firstNameError"  class="error text-red-500">{{ firstNameErrorMessage }}</div>
             <div>
               <label
                 for="lastName"
@@ -78,6 +79,7 @@
                 id="lastName"
                 v-model="form.lastName"
                 ref="lastName"
+                @blur="validateLastName"
                 class="
                   bg-gray-50
                   border border-gray-300
@@ -93,6 +95,7 @@
                 required=""
               />
             </div>
+            <div v-if="lastNameError" class="error text-red-500">{{ lastNameErrorMessage }}</div>
             <div>
               <label
                 for="email"
@@ -105,6 +108,7 @@
                 id="email"
                 v-model="form.email"
                 ref="email"
+                @blur="validateEmail"
                 class="
                   bg-gray-50
                   border border-gray-300
@@ -120,6 +124,7 @@
                 required=""
               />
             </div>
+            <div v-if="emailError"  class="error text-red-500">{{ emailErrorMessage }}</div>
             <div>
               <label
                 for="password"
@@ -132,6 +137,7 @@
                 id="password"
                 v-model="form.password"
                 ref="password"
+                @blur="validatePassword"
                 placeholder="••••••••"
                 class="
                   bg-gray-50
@@ -147,6 +153,7 @@
                 required=""
               />
             </div>
+            <div v-if="passwordError"  class="error text-red-500">{{ passwordErrorMessage }}</div>
             <div>
               <label
                 for="confirmPassword"
@@ -159,6 +166,7 @@
                 id="confirmPassword"
                 v-model="form.confirmPassword"
                 ref="confirmPassword"
+                @blur="validateConfirmPassword"
                 placeholder="••••••••"
                 class="
                   bg-gray-50
@@ -174,6 +182,7 @@
                 required=""
               />
             </div>
+            <div v-if="confirmPasswordError"  class="error text-red-500">{{ confirmPasswordErrorMessage }}</div>
             <button
               type="button"
               class="
@@ -193,14 +202,10 @@
             >
               SIGN UP
             </button>
-            <p class="text-base font-light text-gray-500">
-              Already have an account?
-              <router-link
-                :to="'/login'"
-                class="font-medium text-primary-600 hover:underline"
-                >Log in</router-link
-              >
-            </p>
+            <p class="text-base font-light text-gray-500 padding-left-35px;" style="
+            padding-left: 35px;"> 
+            Already have an account? 
+            <a href="/login" class="font-medium text-primary-600 hover:underline">Log in</a></p>
           </form>
           <div
             v-if="this.errorAlert"
@@ -247,6 +252,11 @@ export default {
         password: "",
         confirmPassword: "",
       },
+      firstNameError: false,
+      lastNameError: false,
+      emailError: false,
+      passwordError: false,
+      confirmPasswordError: false,
       userType: "",
       error: [],
       errorAlert: false,
@@ -261,97 +271,147 @@ export default {
     }
   },
   methods: {
-    async signUp() {
-      this.error = [];
-      this.$refs.firstName.style.borderColor = "";
-      this.$refs.email.style.borderColor = "";
-      this.$refs.password.style.borderColor = "";
-      this.$refs.confirmPassword.style.borderColor = "";
-      if (
-        (this.form.firstName === "" || this.form.firstName.length === 0) &
-        (this.form.email === "" || this.form.email.length === 0) &
-        (this.form.password === "" || this.form.password.length === 0) &
-        (this.form.confirmPassword === "" ||
-          this.form.confirmPassword.length === 0)
-      ) {
-        this.error.push("firstName");
-        this.error.push("email");
-        this.error.push("password");
-        this.error.push("confirmPassword");
-      } else if (
-        this.form.firstName === "" ||
-        this.form.firstName.length === 0
-      ) {
-        this.error.push("firstName");
-      } else if (this.form.email === "" || this.form.email.length === 0) {
-        this.error.push("email");
-      } else if (this.form.password === "" || this.form.password.length === 0) {
-        this.error.push("password");
-      } else if (
-        this.form.confirmPassword === "" ||
-        this.form.confirmPassword.length === 0
-      ) {
-        this.error.push("confirmPassword");
+    validateFirstName() {
+        const regex = /^[a-zA-Z]+$/;
+    if (!this.form.firstName) {
+      this.firstNameError = true;
+      this.firstNameErrorMessage = "First name is required.";
+      this.$refs.firstName.style.borderColor = "red"; 
+    } else if (!regex.test(this.form.firstName)) {
+      this.firstNameError = true;
+      this.firstNameErrorMessage = "First name should contain only letters.";
+      this.$refs.firstName.style.borderColor = "red"; 
+    } else {
+      this.firstNameError = false;
+      this.form.firstNameErrorMessage = "";
+      this.$refs.firstName.style.borderColor = ""; 
+    }
+    },
+    validateLastName() {
+      const regex = /^[a-zA-Z]+$/;
+      if (!this.form.lastName) {
+        this.lastNameError = true;
+        this.lastNameErrorMessage = "Last name is required.";
+        this.$refs.lastName.style.borderColor = "red"; 
+      } else if (!regex.test(this.form.lastName)) {
+        this.lastNameError = true;
+        this.lastNameErrorMessage = "Last name should contain only letters.";
+        this.$refs.lastName.style.borderColor = "red";
       } else {
-        if (this.form.password !== this.form.confirmPassword) {
-          this.error.push("passNotMatch");
-        } else {
-          this.errorMsg = null;
-          const response = await axios.get(
-            properties.server+"/user/check?email=" + this.form.email, {timeout: 10000}
-          );
-
-          if (response.data === true) {
-            this.errorMsg = "Error: Email is already registered";
-            this.errorAlert = true;
-          } else {
-            if (this.form.email.indexOf("@officer.fmc") != -1) {
-              this.userType = "officer";
-            } else if (this.form.email.indexOf("@admin.fmc") != -1) {
-              this.userType = "admin";
-            } else {
-              this.userType = "general";
-            }
-            user.userSignUp(
-              this.form.email,
-              this.form.firstName,
-              this.form.lastName,
-              this.form.password,
-              this.userType
-            );
-
-            this.$router.push({ name: "emailVerification" });
-          }
-        }
-      }
-      if (this.error.includes("passNotMatch")) {
-        this.$refs.password.style.borderColor = "red";
-        this.$refs.confirmPassword.style.borderColor = "red";
-        this.errorMsg = "Error: Password did not Match";
-        this.errorAlert = true;
-      } else {
-        if (this.error.includes("firstName")) {
-          this.$refs.firstName.style.borderColor = "red";
-        }
-        if (this.error.includes("email")) {
-          this.$refs.email.style.borderColor = "red";
-        }
-        if (this.error.includes("password")) {
-          this.$refs.password.style.borderColor = "red";
-        }
-        if (this.error.includes("confirmPassword")) {
-          this.$refs.confirmPassword.style.borderColor = "red";
-        }
-        if (this.error.includes("passNotMatch")) {
-          this.$refs.password.style.borderColor = "red";
-          this.$refs.confirmPassword.style.borderColor = "red";
-        }
-        if (this.error.length > 0) {
-          this.errorMsg = "Error: Please fill the mandatory fields";
-          this.errorAlert = true;
-        }
+        this.lastNameError = false;
+        this.form.lastNameErrorMessage = "";
+        this.$refs.lastName.style.borderColor = "";
       }
     },
-  },
-};
+    validateEmail() {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!this.form.email) {
+          this.emailError = true;
+          this.emailErrorMessage = "Email is required.";
+          this.$refs.email.style.borderColor = "red";
+        } else if (!regex.test(this.form.email)) {
+          this.emailError = true;
+          this.emailErrorMessage = "Enter a valid Email.";
+          this.$refs.email.style.borderColor = "red";
+        } else {
+          this.emailError = false;
+          this.form.emailErrorMessage = "";
+          this.$refs.email.style.borderColor = "";
+        }
+    },
+    validatePassword() {
+      const regex = /^(?=.*[!@#$%^&*])(?=.*\d{3,}).{8,}$/;
+      if (!this.form.password) {
+        this.passwordError = true;
+        this.passwordErrorMessage = "Password is required.";
+        this.$refs.password.style.borderColor = "red"; 
+      } else if (!regex.test(this.form.password)) {
+        this.passwordError = true;
+        this.passwordErrorMessage = "Password should have alteast 8 length, 3 numbers, 1 special character .";
+        this.$refs.password.style.borderColor = "red";
+      } else {
+        this.passwordError = false;
+        this.form.passwordErrorMessage = "";
+        this.$refs.password.style.borderColor = "";
+      }
+    },
+    validateConfirmPassword() {
+      if (!this.form.confirmPassword) {
+        this.confirmPasswordError = true;
+        this.confirmPasswordErrorMessage = "Password is required.";
+        this.$refs.confirmPassword.style.borderColor = "red"; 
+      } else if (this.form.password !== this.form.confirmPassword) {
+        this.confirmPasswordError = true;
+        this.confirmPasswordErrorMessage = "Passwords do not match.";
+        this.$refs.confirmPassword.style.borderColor = "red"; 
+      } else {
+        this.confirmPasswordError = false;
+        this.confirmPasswordErrorMessage = "";
+        this.$refs.confirmPassword.style.borderColor = "";
+      }
+    },
+
+    validateAll() {
+      this.validateFirstName();
+      this.validateLastName();
+      this.validateEmail();
+      this.validatePassword();
+      this.validateConfirmPassword();
+    },
+
+    async signUp() {
+      this.validateAll();
+      this.error = [];
+
+      if (this.firstNameError) {
+        this.error.push("firstName");
+      }
+      if (this.lastNameError) {
+        this.error.push("lastName");
+      }
+      if (this.emailError) {
+        this.error.push("email");
+      }
+      if (this.passwordError) {
+        this.error.push("password");
+      }
+      if (this.confirmPasswordError) {
+        this.error.push("confirmPassword");
+      }
+      // If there are any errors, do not proceed with the sign-up process
+      if (this.error.length > 0) {
+        return;
+      }
+      const response = await axios.get(
+        properties.server+"/user/check?email=" + this.form.email, {timeout: 10000}
+      );
+
+      if (response.data === true) {
+        this.errorMsg = "Error: Email is already registered";
+        this.errorAlert = true;
+      } else {
+        if (this.form.email.indexOf("@officer.fmc") != -1) {
+          this.userType = "official";
+        } else if (this.form.email.indexOf("@admin.fmc") != -1) {
+          this.userType = "admin";
+        }
+          else if (this.form.email.indexOf(".fm@workerc") != -1) {
+          this.userType = "worker";
+        } else {
+          this.userType = "general";
+        }
+        user.userSignUp(
+          this.form.email,
+          this.form.firstName,
+          this.form.lastName,
+          this.form.password,
+          this.userType
+        );
+        this.$router.push({ name: "emailVerification" });
+      }
+ 
+      }
+    }
+  }
+
 </script>

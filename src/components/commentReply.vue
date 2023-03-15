@@ -1,5 +1,7 @@
 <template>
-  <div v-if="replyOn === false" class="
+  <div v-if="isLoggedIn === true">
+    <div v-if="!isLoading">
+      <div v-if="replyOn === false" class="
       flex
       items-start
       w-full
@@ -11,23 +13,23 @@
       shadow-lg
       focus:outline-none
     ">
-    <a :href="'/user/' + email">
-      <img v-if="profileImage" class="w-10 h-10 rounded-full object-cover mr-4 shadow" :src="profileImage"
-        alt="avatar" />
+        <a :href="'/user/' + email">
+          <img v-if="profileImage" class="w-10 h-10 rounded-full object-cover mr-4 shadow" :src="profileImage"
+            alt="avatar" />
 
-      <div v-else
-        class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square mr-4">
-        <span class="font-medium text-gray-300">{{ firstName[0] + lastName[0] }}</span>
-      </div>
-    </a>
+          <div v-else
+            class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square mr-4">
+            <span class="font-medium text-gray-300">{{ firstName[0] + lastName[0] }}</span>
+          </div>
+        </a>
 
-    <!-- <div
+        <!-- <div
       class="inline-flex overflow-hidden relative justify-center items-center w-10 h-10 bg-gray-100 rounded-full dark:bg-gray-600 mr-4">
       <span class="font-medium text-gray-600 dark:text-gray-300">GS</span>
     </div> -->
 
-    <div class="flex w-full overflow-auto">
-      <div id="editableDiv" contenteditable type="text" class="
+        <div class="flex w-full overflow-auto">
+          <div id="editableDiv" contenteditable type="text" class="
           rounded-l-lg
           bg-gray-50
           border
@@ -45,19 +47,19 @@
           editableDiv
         " placeholder="Add a comment..." oninput="if(this.innerHTML.trim()==='<br>')this.innerHTML=''"></div>
 
-      <label for="fileIp" class="right-[60px] absolute self-center hover:text-indigo-600">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-          class="w-6 h-6 self-center mr-3 ml-1">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
-        </svg>
-        <input type="file" @change="previewImage" accept="image/*;capture=camera" id="fileIp"
-          class="absolute w-0 h-0" />
-      </label>
+          <label for="fileIp" class="right-[60px] absolute self-center hover:text-indigo-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-6 h-6 self-center mr-3 ml-1">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+            </svg>
+            <input type="file" @change="previewImage" accept="image/*;capture=camera" id="fileIp"
+              class="absolute w-0 h-0" />
+          </label>
 
-      <button class="
+          <button class="
           inline-flex
           items-center
           px-3
@@ -69,23 +71,23 @@
           focus:outline-none
           hover:bg-indigo-600
         " @click="addComment">
-        Post
-      </button>
-    </div>
-  </div>
+            Post
+          </button>
+        </div>
+      </div>
 
-  <div v-if="imgSrc.length > 0 && replyOn === false" class="w-full           
+      <div v-if="imgSrc.length > 0 && replyOn === false" class="w-full           
           shadow-lg
           py-4 h-auto z-10 absolute rounded-b-xl px-4 bg-gray-500/50">
 
-    <button v-on:click="imgSrc = ''" class="absolute right-[20px] top-[20px] z-10">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="w-7 h-7 hover:text-red-100 bg-red-100 hover:bg-red-600 rounded-md">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
+        <button v-on:click="imgSrc = ''" class="absolute right-[20px] top-[20px] z-10">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-7 h-7 hover:text-red-100 bg-red-100 hover:bg-red-600 rounded-md">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
 
-    <img class="
+        <img class="
             relative
             w-auto
             mx-auto
@@ -95,10 +97,10 @@
             h-auto
             object-contain
           " :src="imgSrc" />
-  </div>
+      </div>
 
-  <div v-if="replyOn === false" class="mb-2 px-5 py-2 mx-auto flex flex-col w-full relative bg-gray-100">
-    <section class="
+      <div v-if="replyOn === false" class="mb-2 px-5 py-2 mx-auto flex flex-col w-full relative bg-gray-100">
+        <section class="
         relative
         flex
         items-center
@@ -107,8 +109,8 @@
         bg-white bg-gray-100
         min-w-screen
       ">
-      <div class="container px-0 mx-auto sm:px-5">
-        <div v-for="item in comments" :key="item.commentID" class="
+          <div class="container px-0 mx-auto sm:px-5">
+            <div v-for="item in comments" :key="item.commentID" class="
             flex-col
             w-full
             py-2
@@ -121,30 +123,30 @@
             sm:rounded-lg sm:shadow-sm
             md:w-2/3
           ">
-          <div class="flex flex-row">
-            <a class="w-14" :href="'/user/' + item.email">
-              <img v-if="item.profileImage.length > 0"
-                class="w-12 h-12 border-2 border-gray-300 rounded-full object-cover" alt="Emily's avatar"
-                :src="item.profileImage" />
+              <div class="flex flex-row">
+                <a class="w-14" :href="'/user/' + item.email">
+                  <img v-if="item.profileImage.length > 0"
+                    class="w-12 h-12 border-2 border-gray-300 rounded-full object-cover" alt="Emily's avatar"
+                    :src="item.profileImage" />
 
-              <div v-else
-                class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square">
-                <span class="font-medium text-gray-300">{{ item.firstName[0] + item.lastName[0] }}</span>
-              </div>
-            </a>
-            <div class="flex-col mt-1 w-full">
+                  <div v-else
+                    class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square">
+                    <span class="font-medium text-gray-300">{{ item.firstName[0] + item.lastName[0] }}</span>
+                  </div>
+                </a>
+                <div class="flex-col mt-1 w-full">
 
-              <div class="flex items-center justify-between">
-                <div class="flex items-center flex-1 px-4 font-bold leading-tight">
-                  <a :href="'/user/' + item.email">
-                    {{ item.firstName }}
-                  </a>
-                  <span :key="index" class="ml-2 text-xs font-normal text-gray-500 w-full">{{
-                      timeSince(new Date(item.year, item.month - 1, item.day, item.hour, item.minute, item.second))
-                  }}</span>
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center flex-1 px-4 font-bold leading-tight">
+                      <a :href="'/user/' + item.email">
+                        {{ item.firstName }}
+                      </a>
+                      <span :key="index" class="ml-2 text-xs font-normal text-gray-500 w-full">{{
+                        timeSince(new Date(item.year, item.month - 1, item.day, item.hour, item.minute, item.second))
+                      }}</span>
 
-                  <div class="dropdown">
-                    <button class="dropbtn                 
+                      <div class="dropdown">
+                        <button class="dropbtn                 
                     p-2
                     text-sm
                     font-medium
@@ -152,33 +154,33 @@
                     rounded-lg
                     hover:bg-gray-200
                     focus:ring-4 focus:outline-none focus:ring-gray-50"
-                      style="background-color: transparent !important;">
-                      <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                          d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z">
-                        </path>
-                      </svg>
-                    </button>
-                    <div class="dropdown-content min-w-max right-[-20px] pt-1 pb-1">
-                      <a href="#"
-                        class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Save</a>
-                      <div class="py-1">
-                        <button v-if="email === item.email || userType === 'admin'"
-                          v-on:click="deleteComment(item.commentID)" class="
+                          style="background-color: transparent !important;">
+                          <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                              d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z">
+                            </path>
+                          </svg>
+                        </button>
+                        <div class="dropdown-content min-w-max right-[-20px] pt-1 pb-1">
+                          <a href="#"
+                            class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Save</a>
+                          <div class="py-1">
+                            <button v-if="email === item.email || userType === 'admin'"
+                              v-on:click="deleteComment(item.commentID)" class="
                           px-4
                           text-base text-red-500
                           hover:text-red-800 hover:bg-gray-100
                           font-normal
                         ">
-                          Delete
-                        </button>
+                              Delete
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              <p class="
+                  <p class="
                   flex-1
                   px-2
                   ml-2
@@ -189,9 +191,9 @@
                   whitespace-pre-wrap
                   leading-normal
                 ">
-                {{ item.comment }}
-              </p>
-              <img v-if="item.imageURL.length > 0" role="img" :aria-label="'post' + item.postID" tabindex="0" class="
+                    {{ item.comment }}
+                  </p>
+                  <img v-if="item.imageURL.length > 0" role="img" :aria-label="'post' + item.postID" tabindex="0" class="
                     focus:outline-none
                     w-full
                     rounded-[15px]
@@ -199,8 +201,9 @@
                     object-cover
                     mt-2
                   " :src="item.imageURL" :alt="'post' + item.postID" />
-              <button class="inline-flex items-center px-1 pt-2 ml-1 flex-column" v-on:click="reply(item.commentID)">
-                <svg class="
+                  <button class="inline-flex items-center px-1 pt-2 ml-1 flex-column"
+                    v-on:click="reply(item.commentID)">
+                    <svg class="
                     w-5
                     h-5
                     ml-2
@@ -209,36 +212,37 @@
                     fill-current
                     hover:text-gray-900
                   " viewBox="0 0 95 78" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M29.58 0c1.53.064 2.88 1.47 2.879 3v11.31c19.841.769 34.384 8.902 41.247 20.464 7.212 12.15 5.505 27.83-6.384 40.273-.987 1.088-2.82 1.274-4.005.405-1.186-.868-1.559-2.67-.814-3.936 4.986-9.075 2.985-18.092-3.13-24.214-5.775-5.78-15.377-8.782-26.914-5.53V53.99c-.01 1.167-.769 2.294-1.848 2.744-1.08.45-2.416.195-3.253-.62L.85 30.119c-1.146-1.124-1.131-3.205.032-4.312L27.389.812c.703-.579 1.49-.703 2.19-.812zm-3.13 9.935L7.297 27.994l19.153 18.84v-7.342c-.002-1.244.856-2.442 2.034-2.844 14.307-4.882 27.323-1.394 35.145 6.437 3.985 3.989 6.581 9.143 7.355 14.715 2.14-6.959 1.157-13.902-2.441-19.964-5.89-9.92-19.251-17.684-39.089-17.684-1.573 0-3.004-1.429-3.004-3V9.936z"
-                    fill-rule="nonzero" />
-                </svg>
-              </button>
-              <button class="inline-flex items-center px-1 -ml-1 flex-column" @click.stop="commentLike(item.commentID)">
-                <svg v-if="item.likedBy.includes(email)" :id="'commentLikeIcon' + item.commentID" class="
+                      <path
+                        d="M29.58 0c1.53.064 2.88 1.47 2.879 3v11.31c19.841.769 34.384 8.902 41.247 20.464 7.212 12.15 5.505 27.83-6.384 40.273-.987 1.088-2.82 1.274-4.005.405-1.186-.868-1.559-2.67-.814-3.936 4.986-9.075 2.985-18.092-3.13-24.214-5.775-5.78-15.377-8.782-26.914-5.53V53.99c-.01 1.167-.769 2.294-1.848 2.744-1.08.45-2.416.195-3.253-.62L.85 30.119c-1.146-1.124-1.131-3.205.032-4.312L27.389.812c.703-.579 1.49-.703 2.19-.812zm-3.13 9.935L7.297 27.994l19.153 18.84v-7.342c-.002-1.244.856-2.442 2.034-2.844 14.307-4.882 27.323-1.394 35.145 6.437 3.985 3.989 6.581 9.143 7.355 14.715 2.14-6.959 1.157-13.902-2.441-19.964-5.89-9.92-19.251-17.684-39.089-17.684-1.573 0-3.004-1.429-3.004-3V9.936z"
+                        fill-rule="nonzero" />
+                    </svg>
+                  </button>
+                  <button class="inline-flex items-center px-1 -ml-1 flex-column"
+                    @click.stop="commentLike(item.commentID)">
+                    <svg v-if="item.likedBy.includes(email)" :id="'commentLikeIcon' + item.commentID" class="
                     w-5
                     h-5
                     text-gray-600
                     cursor-pointer
                     hover:text-gray-700
                   " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
-                </svg>
+                      <path
+                        d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                    </svg>
 
-                <svg v-else :id="'commentLikeIcon' + item.commentID" class="
+                    <svg v-else :id="'commentLikeIcon' + item.commentID" class="
                     w-5
                     h-5
                     text-gray-600
                     cursor-pointer
                     hover:text-gray-700
                   " fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
-                  </path>
-                </svg>
-              </button>
-              <div v-if="item.likedBy.length > 0" class="
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
+                      </path>
+                    </svg>
+                  </button>
+                  <div v-if="item.likedBy.length > 0" class="
                   text-gray-700 text-base
                   inline-flex
                   items-center
@@ -246,35 +250,36 @@
                   -ml-1
                   flex-column
                 ">
-                {{ item.likedBy.length }}
+                    {{ item.likedBy.length }}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <hr v-if="item.replies.length > 0" class="my-1 ml-16 border-gray-200" />
+              <hr v-if="item.replies.length > 0" class="my-1 ml-16 border-gray-200" />
 
-          <!-- replies -->
-          <div v-for="i in item.replies" :key="i.replyID" class="flex flex-row pt-1 md-10 ml-16">
-            <a class="w-11" :href="'/user/' + i.email">
-              <img v-if="i.profileImage.length > 0" class="w-10 h-10 border-2 border-gray-300 rounded-full object-cover"
-                :src="i.profileImage" alt="avatar" />
+              <!-- replies -->
+              <div v-for="i in item.replies" :key="i.replyID" class="flex flex-row pt-1 md-10 ml-16">
+                <a class="w-11" :href="'/user/' + i.email">
+                  <img v-if="i.profileImage.length > 0"
+                    class="w-10 h-10 border-2 border-gray-300 rounded-full object-cover" :src="i.profileImage"
+                    alt="avatar" />
 
-              <div v-else
-                class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square">
-                <span class="font-medium text-gray-300">{{ i.firstName[0] + i.lastName[0] }}</span>
-              </div>
-            </a>
-            <div class="flex-col mt-1 w-full">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center flex-1 px-4 font-bold leading-tight">
-                  <a :href="'/user/' + i.email">
-                    {{ i.firstName }}
-                  </a>
-                  <span :key="index" class="ml-2 text-xs font-normal text-gray-500 w-full">{{
-                      timeSince(new Date(i.year, i.month - 1, i.day, i.hour, i.minute, i.second))
-                  }}</span>
+                  <div v-else
+                    class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square">
+                    <span class="font-medium text-gray-300">{{ i.firstName[0] + i.lastName[0] }}</span>
+                  </div>
+                </a>
+                <div class="flex-col mt-1 w-full">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center flex-1 px-4 font-bold leading-tight">
+                      <a :href="'/user/' + i.email">
+                        {{ i.firstName }}
+                      </a>
+                      <span :key="index" class="ml-2 text-xs font-normal text-gray-500 w-full">{{
+                        timeSince(new Date(i.year, i.month - 1, i.day, i.hour, i.minute, i.second))
+                      }}</span>
 
-                  <div class="dropdown">
-                    <button class="dropbtn                 
+                      <div class="dropdown">
+                        <button class="dropbtn                 
                     p-2
                     text-sm
                     font-medium
@@ -282,32 +287,32 @@
                     rounded-lg
                     hover:bg-gray-50
                     focus:ring-4 focus:outline-none focus:ring-gray-50">
-                      <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                          d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z">
-                        </path>
-                      </svg>
-                    </button>
-                    <div class="dropdown-content min-w-max right-[-20px] pt-1 pb-1">
-                      <a href="#"
-                        class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Save</a>
-                      <div class="py-1">
-                        <button v-if="email === i.email || userType === 'admin'"
-                          v-on:click="deleteReply(item.commentID, i.replyID)" class="
+                          <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                              d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z">
+                            </path>
+                          </svg>
+                        </button>
+                        <div class="dropdown-content min-w-max right-[-20px] pt-1 pb-1">
+                          <a href="#"
+                            class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Save</a>
+                          <div class="py-1">
+                            <button v-if="email === i.email || userType === 'admin'"
+                              v-on:click="deleteReply(item.commentID, i.replyID)" class="
                           px-4
                           text-base text-red-500
                           hover:text-red-800 hover:bg-gray-100
                           font-normal
                         ">
-                          Delete
-                        </button>
+                              Delete
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              <div class="
+                  <div class="
                   flex-1
                   px-2
                   ml-2
@@ -318,9 +323,9 @@
                   whitespace-pre-wrap
                   leading-normal
                 ">
-                {{ i.reply }}
-              </div>
-              <img v-if="i.imageURL.length > 0" role="img" class="
+                    {{ i.reply }}
+                  </div>
+                  <img v-if="i.imageURL.length > 0" role="img" class="
                     focus:outline-none
                     w-full
                     rounded-[15px]
@@ -329,32 +334,33 @@
                     mt-2
                   " :src="i.imageURL" :alt="'reply' + item.commentID + '-' + i.replyID" />
 
-              <button class="inline-flex items-center px-1 pt-2 ml-3.5 flex-column"
-                @click.stop="replyLike(item.commentID, i.replyID)">
-                <svg v-if="i.likedBy.includes(email)" :id="'replyLikeIcon' + item.commentID + '-' + i.replyID" class="
+                  <button class="inline-flex items-center px-1 pt-2 ml-3.5 flex-column"
+                    @click.stop="replyLike(item.commentID, i.replyID)">
+                    <svg v-if="i.likedBy.includes(email)" :id="'replyLikeIcon' + item.commentID + '-' + i.replyID"
+                      class="
                     w-5
                     h-5
                     text-gray-600
                     cursor-pointer
                     hover:text-gray-700
                   " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
-                </svg>
+                      <path
+                        d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                    </svg>
 
-                <svg v-else :id="'replyLikeIcon' + item.commentID + '-' + i.replyID" class="
+                    <svg v-else :id="'replyLikeIcon' + item.commentID + '-' + i.replyID" class="
                     w-5
                     h-5
                     text-gray-600
                     cursor-pointer
                     hover:text-gray-700
                   " fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
-                  </path>
-                </svg>
-              </button>
-              <div v-if="i.likedBy.length > 0" class="
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
+                      </path>
+                    </svg>
+                  </button>
+                  <div v-if="i.likedBy.length > 0" class="
                   text-gray-700 text-base
                   inline-flex
                   items-center
@@ -362,17 +368,17 @@
                   -ml-1
                   flex-column
                 ">
-                {{ i.likedBy.length }}
+                    {{ i.likedBy.length }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
-    </section>
-  </div>
 
-  <!-- Reply Block -->
-  <div v-if="replyOn === true" class="
+      <!-- Reply Block -->
+      <div v-if="replyOn === true" class="
           flex
           items-center
           bg-gray-50
@@ -385,16 +391,16 @@
           border-y
           border-y-gray-400
         ">
-    <button class="hover:text-gray-700" v-on:click="replyOn = false; imgSrc2 = ''">
-      <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor">
-        <path
-          d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z" />
-      </svg>
-    </button>
-    <p class="ml-6 text-lg">Reply</p>
-  </div>
+        <button class="hover:text-gray-700" v-on:click="replyOn = false; imgSrc2 = ''">
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor">
+            <path
+              d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L136.6 216H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H136.6l120.5 114.8c9.8 9.3 10 24.8.4 34.3z" />
+          </svg>
+        </button>
+        <p class="ml-6 text-lg">Reply</p>
+      </div>
 
-  <div class="
+      <div class="
       flex
       items-start
       w-full
@@ -406,18 +412,18 @@
       shadow-lg
       focus:outline-none
     " v-if="replyOn === true">
-    <a class="w-11" :href="'/user/' + email">
-      <img v-if="profileImage" class="w-10 h-10 rounded-full object-cover mr-4 shadow" :src="profileImage"
-        alt="avatar" />
+        <a :href="'/user/' + email">
+          <img v-if="profileImage" class="w-10 h-10 rounded-full object-cover mr-4 shadow" :src="profileImage"
+            alt="avatar" />
 
-      <div v-else
-        class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square mr-4">
-        <span class="font-medium text-gray-300">{{ firstName[0] + lastName[0] }}</span>
-      </div>
-    </a>
+          <div v-else
+            class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square mr-4">
+            <span class="font-medium text-gray-300">{{ firstName[0] + lastName[0] }}</span>
+          </div>
+        </a>
 
-    <div class="flex w-full overflow-auto">
-      <div id="editableDivReply" contenteditable type="text" class="
+        <div class="flex w-full overflow-auto">
+          <div id="editableDivReply" contenteditable type="text" class="
           rounded-l-lg
           bg-gray-50
           border
@@ -435,19 +441,19 @@
           editableDivReply
         " placeholder="Write your reply..." oninput="if(this.innerHTML.trim()==='<br>')this.innerHTML=''" />
 
-      <label for="fileIp2" class="right-[60px] absolute self-center hover:text-indigo-600">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-          class="w-6 h-6 self-center mr-3 ml-1">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
-        </svg>
-        <input type="file" @change="previewImage2" accept="image/*;capture=camera" id="fileIp2"
-          class="absolute w-0 h-0" />
-      </label>
+          <label for="fileIp2" class="right-[60px] absolute self-center hover:text-indigo-600">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-6 h-6 self-center mr-3 ml-1">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+            </svg>
+            <input type="file" @change="previewImage2" accept="image/*;capture=camera" id="fileIp2"
+              class="absolute w-0 h-0" />
+          </label>
 
-      <button class="
+          <button class="
           inline-flex
           items-center
           px-3
@@ -459,24 +465,24 @@
           focus:outline-none
           hover:bg-indigo-600
         " @click="addReply">
-        Post
-      </button>
-    </div>
-  </div>
+            Post
+          </button>
+        </div>
+      </div>
 
-  <!-- Add Image -->
-  <div v-if="imgSrc2.length && replyOn === true > 0" class="w-full           
+      <!-- Add Image -->
+      <div v-if="imgSrc2.length && replyOn === true > 0" class="w-full           
           shadow-lg
           py-4 h-auto z-10 absolute rounded-b-xl px-4 bg-gray-500/50">
 
-    <button v-on:click="imgSrc2 = ''" class="absolute right-[20px] top-[20px] z-10">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-        class="w-7 h-7 hover:text-red-100 bg-red-100 hover:bg-red-600 rounded-md">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
+        <button v-on:click="imgSrc2 = ''" class="absolute right-[20px] top-[20px] z-10">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="w-7 h-7 hover:text-red-100 bg-red-100 hover:bg-red-600 rounded-md">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
 
-    <img class="
+        <img class="
             relative
             w-auto
             mx-auto
@@ -486,10 +492,10 @@
             h-auto
             object-contain
           " :src="imgSrc2" />
-  </div>
+      </div>
 
-  <div v-if="replyOn === true" class="mb-2 px-5 py-2 mx-auto flex flex-col w-full relative bg-gray-100">
-    <section class="
+      <div v-if="replyOn === true" class="mb-2 px-5 py-2 mx-auto flex flex-col w-full relative bg-gray-100">
+        <section class="
         relative
         flex
         items-center
@@ -498,8 +504,8 @@
         bg-white bg-gray-100
         min-w-screen
       ">
-      <div class="container px-0 mx-auto sm:px-5">
-        <div class="
+          <div class="container px-0 mx-auto sm:px-5">
+            <div class="
             flex-col
             w-full
             py-2
@@ -512,37 +518,40 @@
             sm:rounded-lg sm:shadow-sm
             md:w-2/3
           ">
-          <div class="flex flex-row">
-            <a class="w-14" :href="'/user/' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].email">
-              <img v-if="comments[comments.findIndex(x => x.commentID === selectedCommentID)].profileImage.length > 0"
-                class="w-12 h-12 border-2 border-gray-300 rounded-full object-cover" alt="Emily's avatar"
-                :src="comments[comments.findIndex(x => x.commentID === selectedCommentID)].profileImage" />
+              <div class="flex flex-row">
+                <a class="w-14"
+                  :href="'/user/' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].email">
+                  <img
+                    v-if="comments[comments.findIndex(x => x.commentID === selectedCommentID)].profileImage.length > 0"
+                    class="w-12 h-12 border-2 border-gray-300 rounded-full object-cover" alt="Emily's avatar"
+                    :src="comments[comments.findIndex(x => x.commentID === selectedCommentID)].profileImage" />
 
-              <div v-else
-                class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square">
-                <span class="font-medium text-gray-300">{{ comments[comments.findIndex(x => x.commentID ===
-                    selectedCommentID)].firstName[0] + comments[comments.findIndex(x => x.commentID ===
-                      selectedCommentID)].lastName[0]
-                }}</span>
-              </div>
-            </a>
-            <div class="flex-col mt-1 w-full">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center flex-1 px-4 font-bold leading-tight">
-                  <a :href="'/user/' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].email">
-                    {{ comments[comments.findIndex(x => x.commentID === selectedCommentID)].firstName }}
-                  </a>
-                  <span :key="index" class="ml-2 text-xs font-normal text-gray-500 w-full">{{
-                      timeSince(new Date(comments[comments.findIndex(x => x.commentID === selectedCommentID)].year,
-                        comments[comments.findIndex(x => x.commentID === selectedCommentID)].month - 1,
-                        comments[comments.findIndex(x => x.commentID === selectedCommentID)].day,
-                        comments[comments.findIndex(x => x.commentID === selectedCommentID)].hour,
-                        comments[comments.findIndex(x => x.commentID === selectedCommentID)].minute,
-                        comments[comments.findIndex(x => x.commentID === selectedCommentID)].second))
-                  }}</span>
+                  <div v-else
+                    class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square">
+                    <span class="font-medium text-gray-300">{{
+                      comments[comments.findIndex(x => x.commentID ===
+                        selectedCommentID)].firstName[0] + comments[comments.findIndex(x => x.commentID ===
+                          selectedCommentID)].lastName[0]
+                    }}</span>
+                  </div>
+                </a>
+                <div class="flex-col mt-1 w-full">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center flex-1 px-4 font-bold leading-tight">
+                      <a :href="'/user/' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].email">
+                        {{ comments[comments.findIndex(x => x.commentID === selectedCommentID)].firstName }}
+                      </a>
+                      <span :key="index" class="ml-2 text-xs font-normal text-gray-500 w-full">{{
+                        timeSince(new Date(comments[comments.findIndex(x => x.commentID === selectedCommentID)].year,
+                          comments[comments.findIndex(x => x.commentID === selectedCommentID)].month - 1,
+                          comments[comments.findIndex(x => x.commentID === selectedCommentID)].day,
+                          comments[comments.findIndex(x => x.commentID === selectedCommentID)].hour,
+                          comments[comments.findIndex(x => x.commentID === selectedCommentID)].minute,
+                          comments[comments.findIndex(x => x.commentID === selectedCommentID)].second))
+                      }}</span>
 
-                  <div class="dropdown">
-                    <button class="dropbtn                 
+                      <div class="dropdown">
+                        <button class="dropbtn                 
                     p-2
                     text-sm
                     font-medium
@@ -550,33 +559,33 @@
                     rounded-lg
                     hover:bg-gray-50
                     focus:ring-4 focus:outline-none focus:ring-gray-50">
-                      <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                          d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z">
-                        </path>
-                      </svg>
-                    </button>
-                    <div class="dropdown-content min-w-max right-[-20px] pt-1 pb-1">
-                      <a href="#"
-                        class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Save</a>
-                      <div class="py-1">
-                        <button
-                          v-if="email === comments[comments.findIndex(x => x.commentID === selectedCommentID)].email || userType === 'admin'"
-                          v-on:click="deleteComment(selectedCommentID)" class="
+                          <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                              d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z">
+                            </path>
+                          </svg>
+                        </button>
+                        <div class="dropdown-content min-w-max right-[-20px] pt-1 pb-1">
+                          <a href="#"
+                            class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Save</a>
+                          <div class="py-1">
+                            <button
+                              v-if="email === comments[comments.findIndex(x => x.commentID === selectedCommentID)].email || userType === 'admin'"
+                              v-on:click="deleteComment(selectedCommentID)" class="
                           px-4
                           text-base text-red-500
                           hover:text-red-800 hover:bg-gray-100
                           font-normal
                         ">
-                          Delete
-                        </button>
+                              Delete
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              <p class="
+                  <p class="
                   flex-1
                   px-2
                   ml-2
@@ -587,10 +596,10 @@
                   whitespace-pre-wrap
                   leading-normal
                 ">
-                {{ comments[comments.findIndex(x => x.commentID === selectedCommentID)].comment }}
-              </p>
-              <img v-if="comments[comments.findIndex(x => x.commentID === selectedCommentID)].imageURL.length > 0"
-                role="img" class="
+                    {{ comments[comments.findIndex(x => x.commentID === selectedCommentID)].comment }}
+                  </p>
+                  <img v-if="comments[comments.findIndex(x => x.commentID === selectedCommentID)].imageURL.length > 0"
+                    role="img" class="
                     focus:outline-none
                     w-full
                     rounded-[15px]
@@ -598,37 +607,39 @@
                     object-cover
                     mt-2
                   " :src="comments[comments.findIndex(x => x.commentID === selectedCommentID)].imageURL"
-                :alt="'post' + selectedCommentID" />
-              <button class="inline-flex items-center px-1 pt-2 ml-3.5 flex-column"
-                @click.stop="commentLike(comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID)">
-                <svg v-if="comments[comments.findIndex(x => x.commentID === selectedCommentID)].likedBy.includes(email)"
-                  :id="'commentLikeIcon' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID"
-                  class="
+                    :alt="'post' + selectedCommentID" />
+                  <button class="inline-flex items-center px-1 pt-2 ml-3.5 flex-column"
+                    @click.stop="commentLike(comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID)">
+                    <svg
+                      v-if="comments[comments.findIndex(x => x.commentID === selectedCommentID)].likedBy.includes(email)"
+                      :id="'commentLikeIcon' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID"
+                      class="
                     w-5
                     h-5
                     text-gray-600
                     cursor-pointer
                     hover:text-gray-700
                   " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
-                </svg>
+                      <path
+                        d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                    </svg>
 
-                <svg v-else
-                  :id="'commentLikeIcon' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID"
-                  class="
+                    <svg v-else
+                      :id="'commentLikeIcon' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID"
+                      class="
                     w-5
                     h-5
                     text-gray-600
                     cursor-pointer
                     hover:text-gray-700
                   " fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
-                  </path>
-                </svg>
-              </button>
-              <div v-if="comments[comments.findIndex(x => x.commentID === selectedCommentID)].likedBy.length > 0" class="
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
+                      </path>
+                    </svg>
+                  </button>
+                  <div v-if="comments[comments.findIndex(x => x.commentID === selectedCommentID)].likedBy.length > 0"
+                    class="
                   text-gray-700 text-base
                   inline-flex
                   items-center
@@ -636,39 +647,41 @@
                   -ml-1
                   flex-column
                 ">
-                {{ comments[comments.findIndex(x => x.commentID === selectedCommentID)].likedBy.length }}
+                    {{ comments[comments.findIndex(x => x.commentID === selectedCommentID)].likedBy.length }}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <hr v-if="comments[comments.findIndex(x => x.commentID === selectedCommentID)].replies.length > 0"
-            class="my-1 ml-16 border-gray-200" />
+              <hr v-if="comments[comments.findIndex(x => x.commentID === selectedCommentID)].replies.length > 0"
+                class="my-1 ml-16 border-gray-200" />
 
-          <!-- replies -->
-          <div v-for="i in comments[comments.findIndex(x => x.commentID === selectedCommentID)].replies"
-            :key="i.replyID" class="flex flex-row pt-1 md-10 ml-16">
-            <a class="w-11" :href="'/user/' + i.email">
-              <img v-if="i.profileImage.length > 0" class="w-10 h-10 border-2 border-gray-300 rounded-full object-cover"
-                :src="i.profileImage" alt="avatar" />
+              <!-- replies -->
+              <div v-for="i in comments[comments.findIndex(x => x.commentID === selectedCommentID)].replies"
+                :key="i.replyID" class="flex flex-row pt-1 md-10 ml-16">
+                <a class="w-11" :href="'/user/' + i.email">
+                  <img v-if="i.profileImage.length > 0"
+                    class="w-10 h-10 border-2 border-gray-300 rounded-full object-cover" :src="i.profileImage"
+                    alt="avatar" />
 
-              <div v-else
-                class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square">
-                <span class="font-medium text-gray-300">{{ i.firstName[0] + i.lastName[0]
-                }}</span>
-              </div>
-            </a>
+                  <div v-else
+                    class="inline-flex overflow-hidden relative justify-center items-center w-12 h-fit rounded-full bg-gray-500 aspect-square">
+                    <span class="font-medium text-gray-300">{{
+                      i.firstName[0] + i.lastName[0]
+                    }}</span>
+                  </div>
+                </a>
 
-            <div class="flex-col mt-1 w-full">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center flex-1 px-4 font-bold leading-tight">
-                  <a :href="'/user/' + i.email">
-                    {{ i.firstName }}
-                  </a>
-                  <span :key="index" class="ml-2 text-xs font-normal text-gray-500 w-full">{{
-                      timeSince(new Date(i.year, i.month - 1, i.day, i.hour, i.minute, i.second))
-                  }}</span>
+                <div class="flex-col mt-1 w-full">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center flex-1 px-4 font-bold leading-tight">
+                      <a :href="'/user/' + i.email">
+                        {{ i.firstName }}
+                      </a>
+                      <span :key="index" class="ml-2 text-xs font-normal text-gray-500 w-full">{{
+                        timeSince(new Date(i.year, i.month - 1, i.day, i.hour, i.minute, i.second))
+                      }}</span>
 
-                  <div class="dropdown">
-                    <button class="dropbtn                 
+                      <div class="dropdown">
+                        <button class="dropbtn                 
                     p-2
                     text-sm
                     font-medium
@@ -676,33 +689,33 @@
                     rounded-lg
                     hover:bg-gray-50
                     focus:ring-4 focus:outline-none focus:ring-gray-50">
-                      <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path
-                          d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z">
-                        </path>
-                      </svg>
-                    </button>
-                    <div class="dropdown-content min-w-max right-[-20px] pt-1 pb-1">
-                      <a href="#"
-                        class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Save</a>
-                      <div class="py-1">
-                        <button v-if="email === i.email || userType === 'admin'"
-                          v-on:click="deleteReply(selectedCommentID, i.replyID)" class="
+                          <svg class="w-4 h-4" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                              d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z">
+                            </path>
+                          </svg>
+                        </button>
+                        <div class="dropdown-content min-w-max right-[-20px] pt-1 pb-1">
+                          <a href="#"
+                            class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Save</a>
+                          <div class="py-1">
+                            <button v-if="email === i.email || userType === 'admin'"
+                              v-on:click="deleteReply(selectedCommentID, i.replyID)" class="
                           px-4
                           text-base text-red-500
                           hover:text-red-800 hover:bg-gray-100
                           font-normal
                         ">
-                          Delete
-                        </button>
+                              Delete
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              <div class="
+                  <div class="
                   flex-1
                   px-2
                   ml-2
@@ -713,9 +726,9 @@
                   whitespace-pre-wrap
                   leading-normal
                 ">
-                {{ i.reply }}
-              </div>
-              <img v-if="i.imageURL.length > 0" role="img" class="
+                    {{ i.reply }}
+                  </div>
+                  <img v-if="i.imageURL.length > 0" role="img" class="
                     focus:outline-none
                     w-full
                     rounded-[15px]
@@ -723,36 +736,36 @@
                     object-cover
                     mt-2
                   " :src="i.imageURL" :alt="'reply' + selectedCommentID + '-' + i.replyID" />
-              <button class="inline-flex items-center px-1 pt-2 ml-3.5 flex-column"
-                @click.stop="replyLike(comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID, i.replyID)">
-                <svg v-if="i.likedBy.includes(email)"
-                  :id="'replyLikeIcon' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID + '-' + i.replyID"
-                  class="
+                  <button class="inline-flex items-center px-1 pt-2 ml-3.5 flex-column"
+                    @click.stop="replyLike(comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID, i.replyID)">
+                    <svg v-if="i.likedBy.includes(email)"
+                      :id="'replyLikeIcon' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID + '-' + i.replyID"
+                      class="
                     w-5
                     h-5
                     text-gray-600
                     cursor-pointer
                     hover:text-gray-700
                   " xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                  <path
-                    d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
-                </svg>
+                      <path
+                        d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                    </svg>
 
-                <svg v-else
-                  :id="'replyLikeIcon' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID + '-' + i.replyID"
-                  class="
+                    <svg v-else
+                      :id="'replyLikeIcon' + comments[comments.findIndex(x => x.commentID === selectedCommentID)].commentID + '-' + i.replyID"
+                      class="
                     w-5
                     h-5
                     text-gray-600
                     cursor-pointer
                     hover:text-gray-700
                   " fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
-                  </path>
-                </svg>
-              </button>
-              <div v-if="i.likedBy.length > 0" class="
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5">
+                      </path>
+                    </svg>
+                  </button>
+                  <div v-if="i.likedBy.length > 0" class="
                   text-gray-700 text-base
                   inline-flex
                   items-center
@@ -760,13 +773,66 @@
                   -ml-1
                   flex-column
                 ">
-                {{ i.likedBy.length }}
+                    {{ i.likedBy.length }}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
+        </section>
+      </div>
+    </div>
+    <div v-else class="w-max">
+      <div role="status"
+        class="container p-4 border border-t-2 border-gray-300 rounded shadow animate-pulse md:p-6 mx-auto mt-4 w-full">
+        <div class="flex items-center space-x-3">
+          <svg class="text-gray-300 w-14 h-14" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+              clip-rule="evenodd"></path>
+          </svg>
+          <div>
+            <div class="h-10 bg-gray-300 rounded-lg w-80"></div>
+          </div>
         </div>
       </div>
-    </section>
+      <div role="status"
+        class="container p-4 border border-gray-300 rounded shadow animate-pulse md:p-6 mx-autow-full ml-6">
+        <div class="flex items-center space-x-3">
+          <svg class="text-gray-300 w-14 h-14" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+              clip-rule="evenodd"></path>
+          </svg>
+          <div>
+            <div class="h-2.5 bg-gray-300 rounded-full w-32 mb-2"></div>
+            <div class="w-48 h-2 bg-gray-300 rounded-full"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div v-else class="text-center bg-gray-300 py-4 inline-flex w-full justify-center items-center">
+    <button type="button" class="
+                w-fit
+                text-white
+                bg-indigo-500
+                hover:bg-indigo-600
+                focus:ring-4 focus:outline-none focus:ring-indigo-300
+                font-medium
+                rounded-lg
+                text-base
+                px-5
+                py-2.5
+                text-center
+              " v-on:click="login">
+      LOGIN
+    </button>
+    <p class="
+              text-gray-700 text-lg ml-2
+"> to View or Post comment</p>
   </div>
 </template>
 <script>
@@ -797,41 +863,53 @@ export default {
       index: 1,
       timer: null,
       userType: "",
+      isLoggedIn: false,
+      isLoading: true
     };
   },
   beforeMount() {
     if (user.email.length > 0) {
       this.email = user.email;
-    } else {
+    } else if (localStorage.getItem("email") !== null) {
       this.email = localStorage.getItem("email");
     }
+    else {
+      this.email = '';
+    }
+    if (this.email.length > 0) {
+      this.isLoggedIn = true;
+      if (user.firstName.length > 0) {
+        this.firstName = user.firstName;
+      } else {
+        this.firstName = localStorage.getItem("firstName");
+      }
 
-    if (user.firstName.length > 0) {
-      this.firstName = user.firstName;
-    } else {
-      this.firstName = localStorage.getItem("firstName");
+      if (user.lastName.length > 0) {
+        this.lastName = user.lastName;
+      } else {
+        this.lastName = localStorage.getItem("lastName");
+      }
+
+      if (user.profileImage.length > 0) {
+        this.profileImage = user.profileImage;
+      } else if (localStorage.getItem("profileImage") !== null) {
+        this.profileImage = localStorage.getItem("profileImage");
+      } else {
+        this.profileImage = '';
+      }
+
+      if (user.userType.length > 0) {
+        this.userType = user.userType;
+      } else {
+        this.userType = localStorage.getItem("userType");
+      }
     }
 
-    if (user.lastName.length > 0) {
-      this.lastName = user.lastName;
-    } else {
-      this.lastName = localStorage.getItem("lastName");
-    }
-
-    if (user.profileImage.length > 0) {
-      this.profileImage = user.profileImage;
-    } else {
-      this.profileImage = localStorage.getItem("profileImage");
-    }
-
-    if (user.userType.length > 0) {
-      this.userType = user.userType;
-    } else {
-      this.userType = localStorage.getItem("userType");
-    }
   },
   async mounted() {
-    await this.loadData();
+    if (this.isLoggedIn) {
+      await this.loadData();
+    }
   },
   methods: {
     async loadData() {
@@ -842,6 +920,7 @@ export default {
       this.timer = setInterval(() => {
         this.reRender()
       }, 1000)
+      this.isLoading = false;
     },
     addComment() {
       if (!this.firstName) {
@@ -1282,6 +1361,9 @@ export default {
     },
     reRender() {
       this.index++
+    },
+    login() {
+      this.$router.push({ name: "loginPage" });
     }
     // onUpload() {
     //   this.progress = true;
@@ -1330,7 +1412,7 @@ export default {
   },
   beforeUnmount() {
     clearInterval(this.timer);
-  }
+  },
 };
 </script>
 <style scoped>

@@ -15,13 +15,12 @@
         absolute
       "
     >
-      <a
-        href="#"
+      <router-link to="/"
         class="flex items-center mb-6 text-2xl font-semibold text-gray-900"
       >
         <img class="w-8 h-8 mr-2" src="../assets/image.png" alt="logo" />
         FixMyCity
-      </a>
+      </router-link>
       <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
         <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
           <h1
@@ -143,7 +142,8 @@
             >
               LOGIN
             </button>
-            <p class="text-base font-light text-gray-500">
+            <p class="text-base font-light text-gray-500" style="
+            padding-left: 25px;">
               Don’t have an account yet?
               <router-link
                 :to="'/signup'"

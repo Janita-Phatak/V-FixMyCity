@@ -1,5 +1,5 @@
 <template>
-    <headerComponent></headerComponent>
+    <headerWithSideDrawer currentTab="Users"/>
 
     <div
         class="text-lg font-medium text-center text-gray-500 border-b border-gray-200 pt-[54px] lg:pt-[64px] w-full fixed z-10 bg-gray-50 shadow">
@@ -57,7 +57,7 @@
                             class="py-3 sm:py-4">
                             <div class="flex items-center space-x-4">
                                 <div class="flex-shrink-0">
-                                    <img v-if="item.profileImage" class="w-12 h-12 rounded-full"
+                                    <img v-if="item.profileImage" class="w-12 h-12 rounded-full object-cover"
                                         :src="item.profileImage" alt="avatar">
                                     <div v-else
                                         class="inline-flex overflow-hidden relative justify-center items-center w-12 h-auto rounded-full bg-gray-500 aspect-square  shadow">
@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import headerComponent from "@/components/headerComponent.vue";
+import headerWithSideDrawer from "../headerWithSideDrawer.vue";
 import axios from "axios";
 import { properties } from "@/components/axiosInvoc.js";
 import { user } from "@/components/postProblem/stores/userData.js";
@@ -107,7 +107,7 @@ import workerUsers from "@/components/nav-menu/users/workerUsers.vue";
 
 export default {
     name: "usersView",
-    components: { headerComponent, generalUsers, officialUsers, workerUsers, adminUsers },
+    components: { headerWithSideDrawer, generalUsers, officialUsers, workerUsers, adminUsers },
     data() {
         return {
             users: [],

@@ -1,12 +1,11 @@
 <template>
-    <headerComponent></headerComponent>
+    <headerWithSideDrawer currentTab="Manage Profile" :backButton="true" />
     <div class="max-w-4xl flex items-center h-auto lg:h-screen flex-wrap mx-auto my-32 lg:my-0">
 
         <!--Main Col-->
         <div id="profile"
             class="w-full lg:w-3/5 rounded-lg lg:rounded-l-lg lg:rounded-r-none shadow-2xl bg-white mx-6 lg:mx-0">
 
-            <!-- style="background-image: url(profileImage)" -->
             <div class="p-4 md:p-12 text-center lg:text-left">
                 <!-- Image for mobile view-->
                 <img v-if="imgSrc" :src="imgSrc"
@@ -22,7 +21,7 @@
                         <span class="font-medium text-gray-300 text-[5rem]">{{ firstName[0] + lastName[0] }}</span>
                     </div>
                 </div>
-                <div v-if="imgSrc === null" id="changeProfileImageButton" class="mt-4 mb-1.5 hidden lg:hidden">
+                <div id="changeProfileImageButton" class="mt-4 mb-1.5 hidden lg:hidden">
                     <label for="fileIp"
                         class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-lg">
                         Change Profile Image
@@ -31,10 +30,24 @@
                 </div>
                 <div v-if="imgSrc !== null && picture === null" id="uploadProfileImageButton"
                     class="mt-4 mb-1.5 lg:hidden">
-                    <button @click="uploadImage"
+                    <button v-if="uploadingImage === false" @click="uploadImage(); uploadingImage = true"
                         class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg">
                         Upload Image
                     </button>
+                    <div v-if="uploadingImage === true"
+                        class="inline-block px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm leading-tight rounded shadow-md focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out rounded-lg"
+                        style="box-shadow: rgb(0 0 0 / 25%) 0px 10px 60px 0px">
+                        <svg class=" inline mr-3 w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300
+              " viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                fill="currentColor" />
+                            <path
+                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                fill="currentFill" />
+                        </svg>
+                        Uploading...
+                    </div>
                 </div>
                 <div v-if="imgSrc !== null && picture === null" id="resetImageButton" class="mt-1.5 mb-0 lg:hidden">
                     <button @click="resetImage"
@@ -43,10 +56,24 @@
                     </button>
                 </div>
                 <div v-if="picture" id="deleteImageButton" class="mt-4 mb-0 lg:hidden">
-                    <button @click="deleteImage"
+                    <button v-if="deletingImage === false" @click="deleteImage(); deletingImage = true"
                         class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg">
                         Delete Image
                     </button>
+                    <div v-if="deletingImage === true"
+                        class="inline-block px-6 py-2.5 bg-red-500 hover:bg-red-800 text-white font-medium text-sm leading-tight rounded shadow-md focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out rounded-lg"
+                        style="box-shadow: rgb(0 0 0 / 25%) 0px 10px 60px 0px">
+                        <svg class=" inline mr-3 w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300
+              " viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                fill="currentColor" />
+                            <path
+                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                fill="currentFill" />
+                        </svg>
+                        Deleting...
+                    </div>
                 </div>
 
 
@@ -93,6 +120,12 @@
                                     class="ml-3 text-lg font-medium text-gray-900">Official</label>
                             </div>
                             <div class="flex items-center mb-1.5">
+                                <input id="brown-radio" type="radio" value="worker" v-model.lazy="userType2"
+                                    name="colored-radio"
+                                    class="w-5 h-5 accent-indigo-600 bg-gray-100 border-gray-300 focus:ring-indigo-500">
+                                <label for="brown-radio" class="ml-3 text-lg font-medium text-gray-900">worker</label>
+                            </div>
+                            <div class="flex items-center mb-1.5">
                                 <input id="green-radio" type="radio" value="general" v-model.lazy="userType2"
                                     name="colored-radio"
                                     class="w-5 h-5 accent-indigo-600 bg-gray-100 border-gray-300 focus:ring-indigo-500">
@@ -114,7 +147,8 @@
                     </div>
                 </div>
 
-                <div v-if="(viewerUserType === 'admin' && userType === 'official')" class="relative inline-block">
+                <div v-if="(viewerUserType === 'admin' && userType === 'official') || (viewerUserType === 'admin' && userType === 'worker')"
+                    class="relative inline-block">
                     <button @click="postcodeDropdown" id="dropdownSearchButton" data-dropdown-toggle="dropdownSearch"
                         class="inline-flex items-center mt-2 py-2 px-4 font-bold text-center text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300"
                         type="button">Assigned Postcodes <svg class="ml-2 w-4 h-4" aria-hidden="true" fill="none"
@@ -150,7 +184,7 @@
                                         class="w-4 h-4 text-indigo-600 bg-gray-100 rounded border-gray-300 focus:ring-indigo-500">
                                     <label :for="'checkbox-item-' + postcode"
                                         class="ml-4 w-full text-base font-medium text-gray-900 rounded w-auto">{{
-                                                postcode
+                                            postcode
                                         }}</label>
                                 </div>
                             </li>
@@ -163,14 +197,29 @@
                                 </div>
                             </li>
                         </ul>
-                        <button v-if="viewerUserType === 'admin'" @click="updatePostcodes"
+                        <!-- class="inline-block px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm leading-tight rounded shadow-md focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out rounded-lg" -->
+                        <button v-if="viewerUserType === 'admin' && updatingPostcode === false" @click="updatePostcodes"
                             class="flex items-center p-3 font-bold text-indigo-600 bg-gray-50 border-t border-gray-200 justify-center w-full hover:bg-gray-100">
                             Add / Update Postcodes
                         </button>
+                        <div v-if="updatingPostcode === true"
+                        class="inline-block p-3 font-bold text-indigo-600 bg-gray-50 border-t border-gray-200 w-full hover:bg-gray-100 justify-center items-center"
+                        style="box-shadow: rgb(0 0 0 / 25%) 0px 10px 60px 0px">
+                        <svg class=" inline mr-3 w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300
+              " viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                fill="currentColor" />
+                            <path
+                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                fill="currentFill" />
+                        </svg>
+                        Updating...
+                    </div>
                     </div>
                 </div>
 
-                <div v-else-if="userType === 'official'" class="relative inline-block">
+                <div v-else-if="userType === 'official' || userType === 'worker'" class="relative inline-block">
                     <button @click="postcodeDropdown" id="dropdownSearchButton" data-dropdown-toggle="dropdownSearch"
                         class="inline-flex items-center mt-2 py-2 px-4 font-bold text-center text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300"
                         type="button">Assigned Postcodes <svg class="ml-2 w-4 h-4" aria-hidden="true" fill="none"
@@ -207,7 +256,7 @@
                                         disabled>
                                     <label :for="'checkbox-item-' + postcode"
                                         class="ml-4 w-full text-base font-medium text-gray-900 rounded w-auto">{{
-                                                postcode
+                                            postcode
                                         }}</label>
                                 </div>
                             </li>
@@ -222,53 +271,6 @@
                         </ul>
                     </div>
                 </div>
-
-
-
-                <!-- <div class="mx-auto w-fit lg:w-full">
-                <button @click="myFunction" id="dropdownRadioBgHoverButton" data-dropdown-toggle="dropdownRadioBgHover"
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center mt-4"
-                    type="button">Dropdown radio <svg class="ml-2 w-4 h-4" aria-hidden="true" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg></button> -->
-
-                <!-- Dropdown menu -->
-                <!-- <div id="dropdownRadioBgHover"
-                    class="hidden z-10 w-48 bg-white rounded divide-y divide-gray-100 shadow absolute">
-                    <ul class="p-3 space-y-1 text-sm text-gray-700"
-                        aria-labelledby="dropdownRadioBgHoverButton">
-                        <li>
-                            <div class="flex items-center p-2 rounded hover:bg-gray-100">
-                                <input id="default-radio-4" type="radio" value="" name="default-radio"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
-                                <label for="default-radio-4"
-                                    class="ml-2 w-full text-sm font-medium text-gray-900 rounded">Default
-                                    radio</label>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="flex items-center p-2 rounded hover:bg-gray-100">
-                                <input checked id="default-radio-5" type="radio" value="" name="default-radio"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
-                                <label for="default-radio-5"
-                                    class="ml-2 w-full text-sm font-medium text-gray-900 rounded">Checked
-                                    state</label>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="flex items-center p-2 rounded hover:bg-gray-100">
-                                <input id="default-radio-6" type="radio" value="" name="default-radio"
-                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500">
-                                <label for="default-radio-6"
-                                    class="ml-2 w-full text-sm font-medium text-gray-900 rounded">Default
-                                    radio</label>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-                </div> -->
-
 
                 <p class="pt-4 text-gray-600 text-base lg:text-lg flex items-center justify-center lg:justify-start">
                     <svg class="h-5 text-indigo-700 pr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -354,7 +356,7 @@
                                 </path>
                             </svg>
                         </div>
-                        <input type="number" v-model.lazy="contactNo"
+                        <input type="number" v-model="contactNo"
                             class="w-4/5 p-2 text-gray-600 text-base lg:text-lg border-b-2 border-gray-400 outline-none focus:border-indigo-600 pl-10"
                             placeholder="Phone No." />
                     </div>
@@ -371,47 +373,16 @@
                                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
                         </div>
-                        <input type="text" v-model.lazy="city"
+                        <input type="text" v-model="city"
                             class="w-4/5 p-2 text-gray-600 text-base lg:text-lg border-b-2 border-gray-400 outline-none focus:border-indigo-600 pl-10"
                             placeholder="City" />
                     </div>
                     <div class="relative pt-2">
-                        <!-- <div
-                        class="flex absolute inset-y-0 left-8 md:left-14 lg:left-0 items-center pl-3 pointer-events-none z-10">
-                        <svg class="h-5 text-indigo-700 pr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                            </path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                    </div> -->
-                        <input type="number" v-model.lazy="postcode"
+                        <input type="number" v-model="postcode"
                             class="w-4/5 p-2 text-gray-600 text-base lg:text-lg border-b-2 border-gray-400 outline-none focus:border-indigo-600 pl-10"
                             placeholder="Pincode" />
                     </div>
                 </div>
-                <!-- <div class="pt-2">
-                    <input type="text"
-                        class="w-4/5 p-2 text-sm border-b-2 border-gray-400 outline-none opacity-50 focus:border-indigo-600"
-                        placeholder="Subject" />
-                </div> -->
-
-
-                <!-- <div class="relative mb-6">
-                    <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-                        <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor"
-                            viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
-                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
-                        </svg>
-                    </div>
-                    <input type="text" id="input-group-1"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        placeholder="name@flowbite.com">
-                </div> -->
-                <!-- <p class="pt-8 text-sm">Totally optional short description about yourself, what you do and so on.</p> -->
 
                 <div id="editProfileButton" @click="editProfile" class="mt-8 mb-1.5 hidden">
                     <button class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg">
@@ -419,9 +390,25 @@
                     </button>
                 </div>
                 <div id="saveChangesButton" @click="saveChanges" class="mt-8 mb-1.5 hidden">
-                    <button class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg">
+                    <button v-if="savingChanges === false && changesToSave === true"
+                        class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg">
                         Save Changes
                     </button>
+
+                    <div v-if="savingChanges === true"
+                        class="inline-block px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm leading-tight rounded shadow-md focus:shadow-lg focus:outline-none focus:ring-0 active:shadow-lg transition duration-150 ease-in-out rounded-lg"
+                        style="box-shadow: rgb(0 0 0 / 25%) 0px 10px 60px 0px">
+                        <svg class=" inline mr-3 w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300
+              " viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                fill="currentColor" />
+                            <path
+                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                fill="currentFill" />
+                        </svg>
+                        Saving...
+                    </div>
                 </div>
                 <div id="cancelButton" @click="cancelChanges" class="mt-1.5 mb-8 hidden">
                     <button class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg">
@@ -453,7 +440,7 @@
                         <span class="font-medium text-gray-300 text-[8rem]">{{ firstName[0] + lastName[0] }}</span>
                     </div>
                 </div>
-                <div v-if="imgSrc === null" id="changeProfileImageButton2" class="mt-4 mb-3 text-center hidden">
+                <div id="changeProfileImageButton2" class="mt-4 mb-3 text-center hidden">
                     <label class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-lg">
                         Change Profile Image
                         <input type="file" @change="previewImage" accept="image/*;capture=camera" id="fileIp" />
@@ -468,7 +455,7 @@
                 </div>
                 <div v-if="imgSrc !== null && picture === null" id="resetImageButton"
                     class="mt-1.5 text-center mb-1 hidden lg:block">
-                    <button @click="resetImage"
+                    <button v-if="uploadingImage === false" @click="resetImage"
                         class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg">
                         Reset Image
                     </button>
@@ -481,12 +468,6 @@
                 </div>
             </div>
         </div>
-
-
-        <!-- Pin to top right corner -->
-        <!-- <div class="absolute top-0 right-0 h-12 w-18 p-4">
-            <button class="js-change-theme focus:outline-none">🌙</button>
-        </div> -->
 
         <div class="fixed z-10 w-full lg:w-max lg:mt-20vh lg:contents" style="margin-top: 74vh">
             <div class="container px-5 pt-5 pb-3 mx-auto flex flex-wrap flex-col hidden" id="uploadPrompt">
@@ -541,34 +522,15 @@
 </template>
 
 <script>
-import headerComponent from "../headerComponent.vue";
+import headerWithSideDrawer from "../headerWithSideDrawer.vue";
 import axios from "axios";
 import { properties } from "../axiosInvoc.js";
 import { user } from "@/components/postProblem/stores/userData.js";
 import { fb } from "../firebase";
 
-// const people = [
-//     'Wade Cooper',
-//     'Arlene McCoy',
-//     'Devon Webb',
-//     'Tom Cook',
-//     'Tanya Fox',
-//     'Hellen Schmidt',
-// ]
-// const selectedPerson = ref(people[0])
-// const query = ref('')
-
-// const filteredPeople = computed(() =>
-//     query.value === ''
-//         ? people
-//         : people.filter((person) => {
-//             return person.toLowerCase().includes(query.value.toLowerCase())
-//         })
-// )
-
 export default {
     name: "userProfile",
-    components: { headerComponent },
+    components: { headerWithSideDrawer },
     data() {
         return {
             email: "",
@@ -592,16 +554,180 @@ export default {
             viewerEmail: "",
             viewerUserType: "",
             postcodes: [
+                "400001",
+                "400002",
+                "400003",
+                "400004",
+                "400005",
+                "400006",
+                "400007",
+                "400008",
+                "400009",
+                "400010",
+                "400011",
+                "400012",
                 "400013",
+                "400014",
+                "400015",
+                "400016",
+                "400017",
+                "400018",
+                "400019",
+                "400020",
+                "400021",
+                "400022",
+                "400023",
+                "400024",
+                "400025",
+                "400026",
+                "400027",
+                "400028",
+                "400029",
+                "400030",
+                "400031",
+                "400032",
+                "400033",
+                "400034",
+                "400035",
+                "400036",
+                "400037",
+                "400038",
+                "400039",
+                "400040",
+                "400041",
+                "400042",
+                "400043",
+                "400044",
+                "400045",
+                "400046",
+                "400047",
+                "400048",
+                "400049",
+                "400050",
+                "400051",
+                "400052",
+                "400053",
+                "400054",
+                "400055",
+                "400056",
+                "400057",
+                "400058",
+                "400059",
+                "400060",
+                "400061",
+                "400062",
                 "400063",
                 "400064",
+                "400065",
+                "400066",
+                "400067",
+                "400068",
+                "400069",
                 "400070",
+                "400071",
+                "400072",
+                "400073",
+                "400074",
+                "400075",
+                "400076",
+                "400077",
+                "400078",
+                "400079",
+                "400080",
+                "400081",
+                "400082",
+                "400083",
                 "400084",
-                "400086"
+                "400085",
+                "400086",
+                "400087",
+                "400088",
+                "400089",
+                "400090",
+                "400091",
+                "400092",
+                "400093",
+                "400094",
+                "400095",
+                "400096",
+                "400097",
+                "400098",
+                "400099",
+                "400100",
+                "400101",
+                "400102"
             ],
             selectedPostcode: [],
             searchQuery: null,
+            savingChanges: false,
+            changesToSave: false,
+            uploadingImage: false,
+            deletingImage: false,
+            updatingPostcode: false
         };
+    },
+    watch: {
+        contactNo(newVal, oldVal) {
+            if (newVal.toString() !== this.data.contactNo) {
+                this.changesToSave = true;
+            }
+            else if ((this.contactNo === this.data.contactNo && this.city === this.data.city && this.postcode === this.data.postcode) || (this.contactNo === "" && this.data.contactNo === "" && this.city === this.data.city && this.postcode === this.data.postcode)) {
+                this.changesToSave = false;
+            }
+            else {
+                console.log(oldVal)
+            }
+        },
+        city(newVal, oldVal) {
+            if (newVal !== this.data.city) {
+                this.changesToSave = true;
+            }
+            else if ((this.city === this.data.city && this.contactNo === this.data.contactNo && this.postcode === this.data.postcode) || (this.city === "" && this.data.city === "" && this.contactNo === this.data.contactNo && this.postcode === this.data.postcode)) {
+                this.changesToSave = false;
+            }
+            else {
+                console.log(oldVal)
+            }
+        },
+        postcode(newVal, oldVal) {
+            if (newVal.toString() !== this.data.postcode) {
+                this.changesToSave = true;
+            }
+            else if ((this.postcode === this.data.postcode && this.city === this.data.city && this.contactNo === this.data.contactNo) || (this.postcode === "" && this.data.postcode === "" && this.city === this.data.city && this.contactNo === this.data.contactNo)) {
+                this.changesToSave = false;
+            }
+            else {
+                console.log(oldVal)
+            }
+        },
+        imageData(newVal, oldVal) {
+            if (this.imageData !== null || this.imgSrc !== null) {
+                this.changesToSave = true;
+                document.getElementById("changeProfileImageButton").classList.add("hidden");
+                document.getElementById("changeProfileImageButton2").classList.remove("lg:block");
+            }
+            else if ((this.postcode === this.data.postcode && this.city === this.data.city && this.contactNo === this.data.contactNo)) {
+                this.changesToSave = false;
+            }
+            else {
+                console.log(newVal)
+                console.log(oldVal)
+            }
+        },
+        // imgSrc(newVal, oldVal) {
+        //     if (this.imgSrc !== null || this.imageData !== null) {
+        //         this.changesToSave = true;
+        //         document.getElementById("changeProfileImageButton").classList.add("hidden");
+        //         document.getElementById("changeProfileImageButton2").classList.remove("lg:block");
+        //     }
+        //     else if ((this.postcode === this.data.postcode && this.city === this.data.city && this.contactNo === this.data.contactNo)) {
+        //         this.changesToSave = false;
+        //     }
+        //     else {
+        //         console.log(newVal)
+        //         console.log(oldVal)
+        //     }
+        // }
     },
     computed: {
         resultQuery() {
@@ -644,6 +770,9 @@ export default {
 
         if (this.viewerEmail === this.$route.params.email || this.viewerUserType === 'admin') {
             document.getElementById("editProfileButton").classList.remove("hidden");
+        }
+
+        if (this.viewerEmail === this.$route.params.email) {
             document.getElementById("changePasswordButton").classList.remove("hidden");
         }
     },
@@ -676,6 +805,7 @@ export default {
 
         },
         async saveChanges() {
+            this.savingChanges = true;
             if (this.picture !== null) {
                 this.profileImage = this.picture;
             }
@@ -733,6 +863,7 @@ export default {
 
                 }
             )
+            this.savingChanges = false;
 
         },
         cancelChanges() {
@@ -772,8 +903,13 @@ export default {
         resetImage() {
             this.imageData = null;
             this.imgSrc = null;
+            this.uploadingImage = false;
+            document.getElementById("fileIp").value = null;
+            document.getElementById("changeProfileImageButton").classList.remove("hidden");
+            document.getElementById("changeProfileImageButton2").classList.add("lg:block");
         },
         uploadImage() {
+            this.uploadingImage = true;
             this.progress = true;
             this.picture = null;
             const storageRef = fb
@@ -816,8 +952,10 @@ export default {
                     });
                 }
             );
+            this.uploadingImage = false;
         },
         deleteImage() {
+            this.deletingImage = true;
             const storageRef = fb
                 .storage()
                 .ref(this.$route.params.email + "/" + this.imageName)
@@ -837,6 +975,8 @@ export default {
                     setTimeout(() => {
                         document.getElementById("myError").classList.add("hidden");
                     }, 4000);
+                    document.getElementById("changeProfileImageButton").classList.remove("hidden");
+                    document.getElementById("changeProfileImageButton2").classList.add("lg:block");
                 })
                 .catch((error) => {
                     this.uploaded = false;
@@ -849,6 +989,9 @@ export default {
                     }, 4000);
                     console.log(error.message);
                 });
+            this.deletingImage = false;
+            this.uploadingImage = false;
+            document.getElementById("fileIp").value = null;
         },
         changePassword() {
             this.$router.push({ name: "forgotPassword" });
@@ -875,8 +1018,10 @@ export default {
                 this.userType
             );
             if (response.status === 200) {
-                localStorage.setItem("userType", this.userType);
-                user.userType = this.userType;
+                if (this.email === this.viewerEmail) {
+                    localStorage.setItem("userType", this.viewerUserType);
+                    user.userType = this.userType;
+                }
                 console.log("UserType Updated");
                 var modal = document.getElementById("modal");
                 modal.style.display = "none";
@@ -890,6 +1035,7 @@ export default {
             document.getElementById("dropdownSearch").classList.toggle('hidden');
         },
         async updatePostcodes() {
+            this.updatingPostcode = true;
             console.log(this.selectedPostcode);
             await axios.put(properties.server + "/user/assign/postcode?email=" + this.email,
                 this.selectedPostcode
@@ -900,6 +1046,7 @@ export default {
                         user.assignedPostcode = this.selectedPostcode;
                     }
                     this.loadData();
+                    this.updatingPostcode = false;
                 }
             )
         },
@@ -932,9 +1079,9 @@ input::-webkit-inner-spin-button {
 }
 
 /* this is for Firefox */
-input[type=number] {
-    /* -moz-appearance: textfield; */
-}
+/* input[type=number] {
+    -moz-appearance: textfield;
+} */
 
 #fileIp {
     position: absolute;

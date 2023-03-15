@@ -2,20 +2,20 @@
 
     <div v-if="backdrop"  class="modal2"></div>
 
-    <div id="noUsers" class="noUsers hidden">
-        <h1 class="text-2xl">No Users available</h1>
+    <div id="noFeedbacks" class="noFeedbacks hidden">
+        <h1 class="text-2xl">No Feedbacks available</h1>
     </div>
 
 
     <div id="blog" class="bg-gray-50 px-4 pb-5">
         <div class="mx-auto container">
 
-            <div v-if="users.length > 0" class="w-full max-w-md p-4 bg-white border rounded-lg shadow-md sm:p-8 mt-4 lg:mt-6 mx-auto">
+            <div v-if="feedbacks.length > 0" class="w-full max-w-md p-4 bg-white border rounded-lg shadow-md sm:p-8 mt-4 lg:mt-6 mx-auto">
                 <div class="flow-root">
                     <ul role="list" class="divide-y divide-gray-200">
-                        <li v-for="item in users" :key="item.email" @click="cardClicked(item.email)"
+                        <li v-for="item in feedbacks" :key="item.email" @click="cardClicked(item.email)"
                             class="py-3 sm:py-4">
-                            <div class="flex items-center space-x-4">
+                            <div class="flex space-x-4">
                                 <div class="flex-shrink-0">
                                     <img v-if="item.profileImage" class="w-12 h-12 rounded-full object-cover"
                                         :src="item.profileImage" alt="avatar">
@@ -26,11 +26,19 @@
                                     </div>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-lg font-semibold text-gray-900 truncate">
-                                        {{ (item.firstName + " " + item.lastName) }}
-                                    </p>
-                                    <p class="text-lg text-gray-500 truncate">
-                                        {{ item.email }}
+                                    <div class="flex items-center justify-between">
+                                        <h2 class="text-lg font-semibold text-gray-900 -mt-1">
+                                          {{ (item.firstName + " " + item.lastName) }}
+                                        </h2>
+                                        <small class="text-base text-gray-700">{{
+                                            timeSince(new Date(item.year, item.month - 1, item.day, item.hour, item.minute, item.second))
+                                        }}</small>
+                                        <!-- <small class="text-lg text-gray-700">{{
+                                          item.day + "/" + item.month + "/" + item.year
+                                        }}</small> -->
+                                    </div>
+                                    <p class="text-lg text-gray-500">
+                                        {{ item.feedback }}
                                     </p>
                                 </div>
                             </div>
@@ -83,13 +91,13 @@ import { properties } from "@/components/axiosInvoc.js";
 import { user } from "@/components/postProblem/stores/userData.js";
 
 export default {
-    name: "adminUsers",
+    name: "feedbackTab",
     props: {
         backdrop: Boolean,
     },
     data() {
         return {
-            users: [],
+            feedbacks: [],
             email: "",
             isLoading: false
         };
@@ -111,25 +119,67 @@ export default {
     methods: {
         async loadData() {
             this.isLoading = true;
-            await axios.get(properties.server + "/user/users/filter/userType?userType=admin").then(
+            await axios.get(properties.server + "/feedback/get/all").then(
                 (res) => {
-                    this.users = res.data;
+                    this.feedbacks = res.data;
                 }
             )
             this.isLoading = false;
-            if(this.users.length === 0){
-                document.getElementById("noUsers").classList.remove("hidden")
+            if(this.feedbacks.length === 0){
+                document.getElementById("noFeedbacks").classList.remove("hidden")
             }
         },
         cardClicked(email) {
             this.$router.push({ path: "/user/" + email });
+        },
+        timeSince(date) {
+      if (typeof date !== 'object') {
+        date = new Date(date);
+      }
+
+      var seconds = Math.floor((new Date() - date) / 1000);
+      var intervalType;
+
+      var interval = Math.floor(seconds / 31536000);
+      if (interval >= 1) {
+        intervalType = 'year';
+      } else {
+        interval = Math.floor(seconds / 2592000);
+        if (interval >= 1) {
+          intervalType = 'month';
+        } else {
+          interval = Math.floor(seconds / 86400);
+          if (interval >= 1) {
+            intervalType = 'day';
+          } else {
+            interval = Math.floor(seconds / 3600);
+            if (interval >= 1) {
+              intervalType = "hour";
+            } else {
+              interval = Math.floor(seconds / 60);
+              if (interval >= 1) {
+                intervalType = "minute";
+              } else {
+                interval = seconds;
+                intervalType = "second";
+              }
+            }
+          }
         }
+      }
+
+      if (interval > 1 || interval === 0) {
+        intervalType += 's';
+      }
+
+      return interval + ' ' + intervalType + ' ago';
+    },
     }
 }
 </script>
 
 <style>
-.noUsers {
+.noFeedbacks {
     width: max-content;
     margin: 0;
     position: absolute;

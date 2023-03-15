@@ -173,8 +173,29 @@
               ml-5
               mr-5
             "
+          ><p>{{ errorMsg }}</p></div>
+          <div
+            v-if="this.successAlert"
+            class="
+              w-auto
+              bg-green-200
+              border-x border-y border-green-900
+              items-center
+              py-2.5
+              px-3
+              text-lg
+              font-medium
+              text-green-900
+              rounded-lg
+              dark:bg-green-200
+              text-center
+              cursor-default
+              mb-2
+              ml-5
+              mr-5
+            "
           >
-            <p>{{ errorMsg }}</p>
+            <p>{{ successMsg }}</p>
           </div>
         </div>
       </div>
@@ -193,10 +214,14 @@ export default {
       form: {
         email: user.email,
         otp: null,
+        otpSent: false,
+        timeout: null,
       },
       error: [],
       errorAlert: false,
       errorMsg: "",
+      successAlert: false,
+      successMsg: "",
       otpSent: false,
       verified: false,
     };
@@ -215,7 +240,35 @@ export default {
         console.log("Otp Sent");
         this.errorAlert = false;
         this.otpSent = true;
+        // Set otpSent to true and display success message
+        this.successMsg = "OTP sent successfully, use it within 3 minutes";
+        this.successAlert = true;
+
+       
+        let remainingTime = 180; // set the remaining time to 180 seconds (3 minutes)
+        let timerInterval = setInterval(() => {
+            if (remainingTime > 0) {
+                remainingTime--;
+                this.successMsg = `OTP sent successfully, enter it within ${remainingTime} seconds`;
+            } else {
+                clearInterval(timerInterval);
+                this.otpSent = false;
+                this.errorMsg = "OTP expired, Try again";
+                this.errorAlert = true;
+            }
+        }, 1000);
+
+        // Set timeout to discard OTP after 3 minutes
+        this.timeout = setTimeout(() => {
+            clearInterval(timerInterval);
+            this.otpSent = false;
+            this.errorMsg = "OTP expired, Try again";
+            this.errorAlert = true;
+            clearTimeout(this.timeout);
+        }, 180000); 
+
       } else {
+        
         console.log("Error : OTP not sent");
         this.errorMsg = "Error : OTP not sent";
         this.errorAlert = true;
@@ -255,6 +308,7 @@ export default {
         }
       } else {
         console.log("Error : Wrong OTP");
+        this.successAlert = false;
         this.errorMsg = "Error : Wrong OTP";
         this.errorAlert = true;
       }

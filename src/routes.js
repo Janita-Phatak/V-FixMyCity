@@ -82,7 +82,7 @@ const routes=[
     },
     {
         name: 'postsView',
-        path: '/',
+        path: '/posts',
         component: postsView
     },
     {
@@ -107,7 +107,7 @@ const routes=[
     },
     {
         name: 'HomePage',
-        path: '/HomePage',
+        path: '/',
         component: HomePage
     },
     {

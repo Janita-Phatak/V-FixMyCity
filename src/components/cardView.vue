@@ -1,7 +1,8 @@
 <template>
-  <headerComponent></headerComponent>
-  <section class="bg-gray-100" id="detailsBg">
+  <headerWithSideDrawer currentTab="Post" :backButton="true" />
+  <section class="bg-gray-100 pb-[60px]" id="detailsBg" v-if="!isLoading">
     <div class="mt-[53px]">
+      <!-- <div v-if="!isLoading"> -->
       <div class="
           bg-gray-50
           px-4
@@ -54,12 +55,10 @@
               <div class="dropdown-content min-w-max right-[-10px] pt-1 pb-1">
                 <button v-if="userType === 'admin' || userType === 'official'" @click="openResolveTab"
                   class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Resolve</button>
-                <button v-if="userType === 'admin' || userType === 'official'" @click="openUpdateStatusTab"
-                  class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Update</button>
                 <a href="#" class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Save</a>
                 <button class="block py-1 px-4 hover:bg-gray-100 text-base text-gray-700 font-normal ">Report</button>
                 <div class="py-1">
-                  <button v-if="userType === 'admin' || email === post.email" v-on:click="deletePost" class="
+                  <button v-if="userType === 'admin' || email === post.email" v-on:click="openDeletePostModal" class="
                           px-4
                           text-base text-red-500
                           hover:text-red-800 hover:bg-gray-100
@@ -71,45 +70,35 @@
               </div>
             </div>
 
-            <div id="updateStatus" class="modal" style="z-index: 20;">
+            <div id="deletePostModal" class="modal" style="z-index: 20;">
               <div
-                class="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
+                class="deletePostModal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
                 <div
                   class="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
-                  <h5 class="text-xl font-medium leading-normal text-gray-800" id="exampleModalCenteredScrollableLabel">
-                    Update Status
+                  <h5 class="text-xl font-medium leading-normal text-gray-800" >
+                    Alert!
                   </h5>
-                  <button @click="closeUpdateStatus" type="button"
+                  <button @click="closeDeletePostModal" type="button"
                     class="btn-close box-content p-1 text-4xl text-black border-none rounded-none opacity-50 focus:shadow-none focus:outline-none focus:opacity-100 hover:text-black hover:opacity-75 hover:no-underline font-medium"
                     aria-label="Close">&times;</button>
                 </div>
                 <div class="modal-body relative p-4">
                   <div class="flex items-center mb-1.5">
-                    <input id="red-radio" type="radio" value="reported" v-model.lazy="status2" name="colored-radio"
-                      class="w-5 h-5 accent-red-600 bg-gray-100 border-gray-300 focus:ring-red-500">
-                    <label for="red-radio" class="ml-3 text-lg font-medium text-gray-900">Reported</label>
-                  </div>
-                  <div class="flex items-center mb-1.5">
-                    <input id="yellow-radio" type="radio" value="open" v-model.lazy="status2" name="colored-radio"
-                      class="w-5 h-5 accent-yellow-400 bg-gray-100 border-gray-100 focus:ring-yellow-500">
-                    <label for="yellow-radio" class="ml-3 text-lg font-medium text-gray-900">Open</label>
-                  </div>
-                  <div class="flex items-center mb-1.5">
-                    <input id="green-radio" type="radio" value="fixed" v-model.lazy="status2" name="colored-radio"
-                      class="w-5 h-5 accent-green-600 bg-gray-100 border-gray-300 focus:ring-green-500">
-                    <label for="green-radio" class="ml-3 text-lg font-medium text-gray-900">Fixed</label>
+                    <h5 class="text-xl font-medium leading-normal text-gray-800 mx-4" >
+                    Are you sure you want to delete it?
+                  </h5>
                   </div>
                 </div>
 
                 <div
                   class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md">
-                  <button @click="closeUpdateStatus" type="button"
+                  <button @click="closeDeletePostModal" type="button"
                     class="inline-block px-6 py-2.5 bg-red-500 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-red-600 hover:shadow-lg focus:bg-red-300 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-700 active:shadow-lg transition duration-150 ease-in-out">
                     Cancel
                   </button>
-                  <button @click="saveStatusChanges" type="button"
+                  <button @click="deletePost" type="button"
                     class="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out ml-1">
-                    Save changes
+                    Yes, delete
                   </button>
                 </div>
               </div>
@@ -168,7 +157,7 @@
                                 <label :for="item.email"
                                   class="flex items-center space-x-4 py-3 my-1 sm:py-4 px-2 border-2 border-gray-300 rounded-lg peer-checked/selected:bg-indigo-200 peer-checked/selected:ring-indigo-600 peer-checked/selected:ring-2">
                                   <div class="flex-shrink-0">
-                                    <img v-if="item.profileImage" class="w-12 h-12 rounded-full"
+                                    <img v-if="item.profileImage" class="w-12 h-12 rounded-full object-cover"
                                       :src="item.profileImage" alt="avatar">
                                     <div v-else
                                       class="inline-flex overflow-hidden relative justify-center items-center w-12 h-auto rounded-full bg-gray-500 aspect-square  shadow">
@@ -212,14 +201,66 @@
 
                   <div
                     class="modal-footer flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 rounded-b-md justify-center">
-                    <button @click="closeResolveIssue" type="button"
-                      class="inline-block px-6 py-2.5 bg-red-500 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-red-600 hover:shadow-lg focus:bg-red-300 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-700 active:shadow-lg transition duration-150 ease-in-out">
-                      Cancel
+                    <button
+                      v-if="selectedWorker2 === selectedWorker && selectedWorker && post.assignedWorker && unAssigningWorker === false"
+                      @click="unassignWorker('reported')" type="button"
+                      class="inline-block px-6 py-2.5 bg-red-500 text-white font-medium text-sm leading-tight uppercase rounded shadow-md hover:bg-red-600 hover:shadow-lg focus:bg-red-300 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-700 active:shadow-lg transition duration-150 ease-in-out">
+                      Unassign
                     </button>
-                    <button @click="assignWorker" type="button"
-                      class="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out ml-1">
+                    <div v-if="unAssigningWorker === true"
+                      class="inline-block px-6 py-2.5 bg-red-500 text-white font-medium text-sm leading-tight uppercase rounded shadow-md hover:bg-red-600 hover:shadow-lg focus:bg-red-300 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-red-700 active:shadow-lg transition duration-150 ease-in-out"
+                      style="box-shadow: rgb(0 0 0 / 25%) 0px 10px 60px 0px">
+                      <svg class=" inline mr-3 w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300
+              " viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                          fill="currentColor" />
+                        <path
+                          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                          fill="currentFill" />
+                      </svg>
+                      Removing...
+                    </div>
+                    <button v-if="selectedWorker !== selectedWorker2 && selectedWorker2 && assigningWorker === false"
+                      @click="assignWorker" type="button"
+                      class="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-sm leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out ml-1">
                       Assign
                     </button>
+
+                    <div v-if="assigningWorker === true" class="
+                    inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-sm leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out ml-1
+            " style="box-shadow: rgb(0 0 0 / 25%) 0px 10px 60px 0px">
+                      <svg class=" inline mr-3 w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300
+              " viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                          fill="currentColor" />
+                        <path
+                          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                          fill="currentFill" />
+                      </svg>
+                      Assigning...
+                    </div>
+
+                    <button v-if="post.assignedWorker && selectedWorker && (markingAsResolved === false)"
+                      @click="markAsResolved" type="button"
+                      class="inline-block px-6 py-2.5 bg-emerald-600 text-white font-medium text-sm leading-tight uppercase rounded shadow-md hover:bg-green-700 hover:shadow-lg focus:bg-emerald-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-emerald-800 active:shadow-lg transition duration-150 ease-in-out ml-1">
+                      Mark as Resolved
+                    </button>
+                    <div v-if="markingAsResolved === true"
+                      class="inline-block px-6 py-2.5 bg-emerald-600 text-white font-medium text-sm leading-tight uppercase rounded shadow-md hover:bg-green-700 hover:shadow-lg focus:bg-emerald-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-emerald-800 active:shadow-lg transition duration-150 ease-in-out ml-1"
+                      style="box-shadow: rgb(0 0 0 / 25%) 0px 10px 60px 0px">
+                      <svg class=" inline mr-3 w-4 h-4 text-gray-200 animate-spin dark:text-gray-600 fill-gray-600 dark:fill-gray-300
+              " viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                          fill="currentColor" />
+                        <path
+                          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                          fill="currentFill" />
+                      </svg>
+                      Processing...
+                    </div>
                   </div>
                 </div>
               </div>
@@ -351,13 +392,59 @@
           </div>
         </div>
       </div>
+      <!-- </div> -->
       <CommentReply />
     </div>
   </section>
+  <div v-else class="mt-[53px]">
+    <div role="status" class="p-4 border border-gray-300 rounded shadow animate-pulse md:p-6 mx-auto my-2 w-full">
+      <div class="flex items-center mt-2 space-x-3">
+        <svg class="text-gray-300 w-14 h-14" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+            clip-rule="evenodd"></path>
+        </svg>
+        <div>
+          <div class="h-2.5 bg-gray-300 rounded-full w-32 mb-2"></div>
+          <div class="w-48 h-2 bg-gray-300 rounded-full"></div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center h-64 mb-4 bg-gray-300 rounded mt-4">
+        <svg class="w-12 h-12 text-gray-200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="currentColor"
+          viewBox="0 0 640 512">
+          <path
+            d="M480 80C480 35.82 515.8 0 560 0C604.2 0 640 35.82 640 80C640 124.2 604.2 160 560 160C515.8 160 480 124.2 480 80zM0 456.1C0 445.6 2.964 435.3 8.551 426.4L225.3 81.01C231.9 70.42 243.5 64 256 64C268.5 64 280.1 70.42 286.8 81.01L412.7 281.7L460.9 202.7C464.1 196.1 472.2 192 480 192C487.8 192 495 196.1 499.1 202.7L631.1 419.1C636.9 428.6 640 439.7 640 450.9C640 484.6 612.6 512 578.9 512H55.91C25.03 512 .0006 486.1 .0006 456.1L0 456.1z" />
+        </svg>
+      </div>
+
+      <div class="mx-4">
+        <div>
+          <div class="h-2.5 bg-gray-300 rounded-full w-32 mb-2"></div>
+          <div class="w-48 h-2 bg-gray-300 rounded-full"></div>
+        </div>
+
+        <div class="h-2 bg-gray-300 rounded-full my-2"></div>
+        <div class="grid grid-cols-3 gap-4 mb-4">
+          <div class="h-2 bg-gray-300 rounded col-span-2"></div>
+          <div class="h-2 bg-gray-300 rounded col-span-1"></div>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div class="h-2 bg-gray-300 rounded col-span-1"></div>
+          <div class="h-2 bg-gray-300 rounded col-span-2"></div>
+        </div>
+        <div class="h-2 bg-gray-300 rounded-full my-2"></div>
+        <div class="grid grid-cols-7 gap-4 mb-4">
+          <div class="h-2 bg-gray-300 rounded col-span-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
-import headerComponent from "./headerComponent.vue";
+import headerWithSideDrawer from "./headerWithSideDrawer.vue";
 import axios from "axios";
 import { properties } from "./axiosInvoc.js";
 import { user } from "@/components/postProblem/stores/userData.js";
@@ -366,7 +453,7 @@ import CommentReply from "./commentReply.vue";
 
 export default {
   name: "cardView",
-  components: { headerComponent, CommentReply },
+  components: { headerWithSideDrawer, CommentReply },
   data() {
     return {
       email: "",
@@ -389,6 +476,10 @@ export default {
       selectedWorker2: "",
       noWorker: false,
       noWorkerShow: false,
+      isLoading: true,
+      assigningWorker: false,
+      unAssigningWorker: false,
+      markingAsResolved: false
     };
   },
   computed: {
@@ -463,7 +554,8 @@ export default {
           this.pprofileImage = null;
         }
       }
-      )
+      );
+      this.isLoading = false;
     },
     async loadWorkerData() {
       await axios.get(properties.server + "/user/worker/filter/postcode?postcode=" + this.post.postcode).then(
@@ -544,27 +636,10 @@ export default {
         }
       }
     },
-    openUpdateStatusTab() {
-      var x = document.getElementById("updateStatus");
-      // x.classList.toggle("hidden");
-      x.style.display = "block";
-    },
     openResolveTab() {
       var x = document.getElementById("resolveIssue");
       // x.classList.toggle("hidden");
       x.style.display = "block";
-    },
-    closeUpdateStatus() {
-      this.status2 = this.status;
-      var modal = document.getElementById("updateStatus");
-      modal.style.display = "none";
-
-      // When the user clicks anywhere outside of the modal, close it
-      // window.onclick = function (event) {
-      //   if (event.target == modal) {
-      //     modal.style.display = "none";
-      //   }
-      // }
     },
     closeResolveIssue() {
       this.selectedWorker2 = this.selectedWorker;
@@ -583,8 +658,6 @@ export default {
           if (res.status === 200) {
             this.loadData();
             console.log("Status Updated");
-            var modal = document.getElementById("updateStatus");
-            modal.style.display = "none";
           } else {
             console.log("Error");
           }
@@ -610,22 +683,56 @@ export default {
       this.selectedWorker2 = email;
     },
     async assignWorker() {
+      this.assigningWorker = true;
       await axios.put(properties.server + "/post/details/assign/worker?postID=" + this.$route.params.postID + "&email=" + this.selectedWorker2).then(
         (res) => {
           if (res.status === 200) {
-            if(this.status === "reported"){
+            this.selectedWorker = this.selectedWorker2;
+            if (this.status === "reported" || this.status === "fixed") {
               this.status2 = "open";
               this.loadWorkerData();
               this.saveStatusChanges();
             }
-            else{         
-              this.status2 = this.status;     
+            else {
+              this.status2 = this.status;
               this.loadWorkerData();
               this.loadData();
             }
           }
         }
       )
+      this.assigningWorker = false;
+    },
+    async removeWorker(status) {
+      await axios.delete(properties.server + "/post/details/unassign/worker?postID=" + this.$route.params.postID).then(
+        (res) => {
+          if (res.status === 200) {
+            this.status2 = status;
+            this.loadWorkerData();
+            this.saveStatusChanges();
+          }
+        }
+      );
+    },
+    async unassignWorker() {
+      this.unAssigningWorker = true;
+      await this.removeWorker("reported");
+      this.selectedWorker2 = "";
+      this.selectedWorker = "";
+      this.unAssigningWorker = false;
+    },
+    async markAsResolved() {
+      this.markingAsResolved = true;
+      await this.removeWorker("fixed");
+      this.markingAsResolved = false;
+    },
+    openDeletePostModal() {
+      var x = document.getElementById("deletePostModal");
+      x.style.display = "block";
+    },
+    closeDeletePostModal() {
+      var modal = document.getElementById("deletePostModal");
+      modal.style.display = "none";
     }
   },
 };
@@ -960,6 +1067,19 @@ export default {
   -ms-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   min-height: 60vh;
+  justify-content: space-between;
+  /* height: -webkit-fill-available; */
+}
+.deletePostModal-content {
+  width: 60vw;
+  /* width: max-content; */
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  min-height: 30vh;
   justify-content: space-between;
   /* height: -webkit-fill-available; */
 }

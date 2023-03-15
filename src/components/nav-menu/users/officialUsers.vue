@@ -16,7 +16,7 @@
                             class="py-3 sm:py-4">
                             <div class="flex items-center space-x-4">
                                 <div class="flex-shrink-0">
-                                    <img v-if="item.profileImage" class="w-12 h-12 rounded-full"
+                                    <img v-if="item.profileImage" class="w-12 h-12 rounded-full object-cover"
                                         :src="item.profileImage" alt="avatar">
                                     <div v-else
                                         class="inline-flex overflow-hidden relative justify-center items-center w-12 h-auto rounded-full bg-gray-500 aspect-square  shadow">
@@ -39,6 +39,39 @@
             </div>
 
         </div>
+
+        <div v-if="isLoading">
+            <div role="status"
+                class="container p-4 border border-gray-300 rounded shadow animate-pulse md:p-6 mx-auto my-4 w-full">
+                <div class="flex items-center space-x-3">
+                    <svg class="text-gray-300 w-14 h-14" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <div>
+                        <div class="h-2.5 bg-gray-300 rounded-full w-32 mb-2"></div>
+                        <div class="w-48 h-2 bg-gray-300 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+            <div role="status"
+                class="container p-4 border border-gray-300 rounded shadow animate-pulse md:p-6 mx-auto my-4 w-full">
+                <div class="flex items-center space-x-3">
+                    <svg class="text-gray-300 w-14 h-14" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                    <div>
+                        <div class="h-2.5 bg-gray-300 rounded-full w-32 mb-2"></div>
+                        <div class="w-48 h-2 bg-gray-300 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </template>
@@ -57,6 +90,7 @@ export default {
         return {
             users: [],
             email: "",
+            isLoading: false
         };
     },
     async mounted() {
@@ -75,12 +109,13 @@ export default {
 
     methods: {
         async loadData() {
+            this.isLoading = true;
             await axios.get(properties.server + "/user/users/filter/userType?userType=official").then(
                 (res) => {
                     this.users = res.data;
                 }
             )
-
+            this.isLoading = false;
             if(this.users.length === 0){
                 document.getElementById("noUsers").classList.remove("hidden")
             }

@@ -356,6 +356,7 @@ export default {
         commentIDs: []
       });
       if (response.status == 200) {
+        data.clearDetails();
         console.log("Submitted Successfully");
         this.$router.push({ name: "postsView" });
       }

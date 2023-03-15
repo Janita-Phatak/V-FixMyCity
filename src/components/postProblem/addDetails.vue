@@ -73,12 +73,8 @@
                     w-full
                     pl-10
                     p-2.5
-                    dark:bg-gray-100
-                    dark:border-gray-600
-                    dark:placeholder-gray-400
-                    dark:text-gray-900
-                    dark:focus:ring-blue-500
-                    dark:focus:border-blue-500
+                    focus:ring-blue-500
+                    focus:border-blue-500
                     shadow-md
                   "
                   style="
@@ -92,6 +88,7 @@
                   :itemProjection="itemProjectionFunction"
                   @selectItem="selectItemEventHandler"
                   :value="type"
+                  @onInput="onInputEventHandler"
                 />
               </div>
 
@@ -385,10 +382,9 @@ export default {
     back() {
       this.$router.push({ name: "uploadImage" });
     },
-    // onInputEventHandler(e) {
-    //   // console.log(e);
-    //   this.type = e.input;
-    // },
+    onInputEventHandler(e) {
+      this.type = e.input;
+    },
     selectItemEventHandler(e) {
       // console.log(e);
       this.type = e;

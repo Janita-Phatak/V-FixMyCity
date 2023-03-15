@@ -52,6 +52,34 @@ const data = {
             this.description = description
         // console.log(this.type+"\n"+description);
         this.detailsTab = true;
+    },
+
+    clearDetails(){
+        this.city= "";
+        this.area= "";
+        this.postcode= "";
+        this.additionalDetails= "";
+        this.street_address= "";
+        this.address= "";
+        this.lat= "";
+        this.long= "";
+        this.imageURL= "";
+        this.tempImage= "";
+        this.imageName= "";
+        this.type= "";
+        this.description= "";
+        this.locationTab= false;
+        this.imageTab= false;
+        this.detailsTab= false;
+        this.submitTab= false;
+        this.email= "";
+        this.firstName= "";
+        this.lastName= "";
+        this.userType= "";
+        this.userCity= "";
+        this.userPostcode= "";
+        this.contactNo = "",
+        this.profileImage= "";
     }
 
 }

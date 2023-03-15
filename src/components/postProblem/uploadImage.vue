@@ -222,7 +222,7 @@
           @change="previewImage"
           accept="image/*;capture=camera"
           id="fileIp"
-        />
+        />      
       </label>
 
       <div
@@ -449,6 +449,7 @@ export default {
   components: { stepsToComplete, reportHeader },
   data() {
     return {
+      error: null,
       triggerTitle: "",
       purpleImage: false,
       greenImage: false,
@@ -542,7 +543,30 @@ export default {
     back() {
       this.$router.push({ name: "fetchLocation" });
     },
-    previewImage(event) {
+        previewImage(event) {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      const file = event.target.files[0];
+
+      // Check if the file type is allowed
+      if (!allowedTypes.includes(file.type)) {
+        const box = document.getElementById("myError");
+        box.style.visibility = "visible";
+        this.error = "Only JPEG, JPG, and PNG files are allowed.";
+        setTimeout(() => {
+          const box = document.getElementById("myError");
+          box.style.visibility = "hidden";
+        }, 4000);
+        return;
+      }
+
+      // Preview the image
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.imageUrl = e.target.result;
+        this.error = null;
+      };
+      reader.readAsDataURL(file);
+
       this.uploadValue = 0;
       this.picture = null;
       this.imageData = event.target.files[0];
@@ -550,6 +574,7 @@ export default {
       this.imgSrc = URL.createObjectURL(this.imageData);
       // fileName = event.target.files[0].name;
     },
+
     onUpload() {
       this.progress = true;
       this.picture = null;
